@@ -12,6 +12,31 @@ body {
   margin: 0;
 }
 
+h2 {
+  text-align: center;
+}
+
+#buscador {
+  width: 90%;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+.filtros {
+  text-align: center;
+}
+
+.filtros button {
+  margin: 5px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #222;
+  color: white;
+}
+
 #productos {
   display: flex;
   flex-wrap: wrap;
@@ -40,53 +65,61 @@ button {
   background: red;
   color: white;
   font-weight: bold;
+  margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h2 style="text-align:center;">📦 Inventario</h2>
+<h2>📦 Inventario</h2>
+
+<input type="text" id="buscador" placeholder="Buscar producto...">
+
+<div class="filtros">
+  <button onclick="filtrar('')">Todos</button>
+  <button onclick="filtrar('invierno')">Invierno</button>
+  <button onclick="filtrar('verano')">Verano</button>
+  <button onclick="filtrar('tecnologia')">Tecnología</button>
+</div>
 
 <div id="productos"></div>
 
 <script>
 const url = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
 
-// 🔥 CAMBIA ESTO LUEGO
+// 🔥 CONFIGURA ESTO CUANDO TENGAS TU FORM
 const FORM = "https://docs.google.com/forms/d/e/TU_FORM_ID/viewform";
 const ENTRY_PRODUCTO = "entry.111111";
 const ENTRY_CANTIDAD = "entry.222222";
 
-fetch(url)
-.then(r => r.json())
-.then(data => {
+let productos = [];
 
+// 🎯 RENDER
+function render(lista){
   let html = "";
 
-  data.forEach(p => {
+  lista.forEach(p => {
 
-    let obj = {};
-    Object.keys(p).forEach(k=>{
-      obj[k.trim().toLowerCase()] = p[k];
-    });
+    const nombre = p.producto || "Producto";
+    const precio = p.precio || 0;
+    const stock = p.stock || 0;
+    const imagen = p.imagen || "https://via.placeholder.com/150";
 
-    const nombre = obj["producto"] || "Producto";
-    const precio = obj["precio"] || 0;
-    const stock = obj["stock"] || 0;
-    const imagen = obj["imagen"] || "https://via.placeholder.com/150";
+    const colorStock = stock <= 5 ? 'red' : stock <= 10 ? 'orange' : 'lime';
 
-    const link = `${FORM}?${ENTRY_PRODUCTO}=${encodeURIComponent(nombre)}&${ENTRY_CANTIDAD}=1`;
+    const linkVenta = `${FORM}?${ENTRY_PRODUCTO}=${encodeURIComponent(nombre)}&${ENTRY_CANTIDAD}=1`;
 
     html += `
       <div class="card">
         <img src="${imagen}">
         <h3>${nombre}</h3>
         <p>💲 S/ ${precio}</p>
-        <p style="color:${stock <= 5 ? 'red' : 'lime'};">
-          📦 ${stock}
+        <p style="color:${colorStock};">
+          📦 Stock: ${stock}
         </p>
-        <a href="${link}" target="_blank">
+
+        <a href="${linkVenta}" target="_blank">
           <button>VENDER</button>
         </a>
       </div>
@@ -94,7 +127,43 @@ fetch(url)
   });
 
   document.getElementById("productos").innerHTML = html;
+}
+
+// 📥 CARGAR DATOS
+fetch(url)
+.then(r => r.json())
+.then(data => {
+
+  productos = data.map(p => {
+    let obj = {};
+    Object.keys(p).forEach(k=>{
+      obj[k.trim().toLowerCase()] = p[k];
+    });
+    return obj;
+  });
+
+  render(productos);
 });
+
+// 🔍 BUSCADOR
+document.getElementById("buscador").addEventListener("input", e => {
+  const texto = e.target.value.toLowerCase();
+
+  const filtrados = productos.filter(p =>
+    (p.producto || "").toLowerCase().includes(texto)
+  );
+
+  render(filtrados);
+});
+
+// 🧊 FILTRO
+function filtrar(cat){
+  const filtrados = productos.filter(p =>
+    (p.categoria || "").toLowerCase().includes(cat)
+  );
+
+  render(filtrados);
+}
 </script>
 
 </body>
