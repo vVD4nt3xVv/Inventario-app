@@ -5,95 +5,45 @@
 <title>A&T KAMIARA</title>
 
 <style>
-body {
-  background:#0b0b0b;
-  color:white;
-  font-family:Arial;
-  margin:0;
-}
+body {background:#0b0b0b;color:white;font-family:Arial;margin:0;}
 
-/* PORTADA */
-#portada {
-  text-align:center;
-}
+#portada {text-align:center;}
+#portada img {width:100%;height:200px;object-fit:cover;}
+.titulo {font-size:22px;margin-top:10px;}
+.sub {color:gray;}
 
-#portada img {
-  width:100%;
-  height:200px;
-  object-fit:cover;
-}
+#login {text-align:center;padding:20px;}
 
-.titulo {
-  font-size:22px;
-  margin-top:10px;
-}
-
-.sub {
-  color:gray;
-}
-
-/* CATEGORIAS */
-#menu {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-}
-
+#menu {display:flex;flex-wrap:wrap;justify-content:center;}
 .menu-card {
-  width:40%;
-  margin:10px;
-  padding:10px;
-  border-radius:15px;
-  background:#111;
-  text-align:center;
+  width:40%;margin:10px;padding:10px;border-radius:15px;
+  background:#111;text-align:center;
 }
+.menu-card img {width:100%;border-radius:10px;}
 
-.menu-card img {
-  width:100%;
-  border-radius:10px;
-}
-
-/* PRODUCTOS */
-#productos {
-  display:none;
-  flex-wrap:wrap;
-  justify-content:center;
-}
-
+#productos {display:none;flex-wrap:wrap;justify-content:center;}
 .card {
-  width:45%;
-  margin:10px;
-  padding:10px;
-  border-radius:15px;
-  background:#111;
+  width:45%;margin:10px;padding:10px;border-radius:15px;background:#111;
 }
-
-.card img {
-  width:100%;
-  border-radius:10px;
-}
+.card img {width:100%;border-radius:10px;}
 
 button {
-  width:100%;
-  margin-top:5px;
-  padding:8px;
-  border:none;
-  border-radius:10px;
-  background:red;
-  color:white;
+  width:100%;margin-top:5px;padding:8px;border:none;
+  border-radius:10px;background:red;color:white;
 }
 
-/* VOLVER */
-#volver {
-  display:none;
-  padding:10px;
-  background:#222;
-  text-align:center;
-}
+#volver {display:none;padding:10px;background:#222;text-align:center;}
 </style>
 </head>
 
 <body>
+
+<!-- LOGIN -->
+<div id="login">
+  <h3>Ingresar vendedor</h3>
+  <input id="usuario" placeholder="Nombre vendedor" style="padding:10px;">
+  <button onclick="guardarUsuario()">Entrar</button>
+</div>
 
 <!-- PORTADA -->
 <div id="portada">
@@ -125,21 +75,41 @@ button {
 <div id="productos"></div>
 
 <script>
+// 🔥 TU SHEET
 const url = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
 
-// 🔥 FORMULARIO (LUEGO LO CONFIGURAMOS)
-const FORM = "https://docs.google.com/forms/d/e/TU_FORM_ID/viewform";
-const ENTRY_PRODUCTO = "entry.111";
-const ENTRY_CANTIDAD = "entry.222";
+// 🔥 TU FORMULARIO REAL
+const FORM = "https://docs.google.com/forms/d/e/1FAIpQLSeoXDQp-aMlsrDCrq1r42QybYUgL-hdi1PiIWpRgnTc2A0STg/viewform";
+
+const ENTRY_PRODUCTO = "entry.1002750291";
+const ENTRY_TIPO = "entry.112461346";
+const ENTRY_CANTIDAD = "entry.838577118";
+const ENTRY_VENDEDOR = "entry.618694440";
 
 let data = [];
 
-// cargar datos
+// LOGIN
+function guardarUsuario(){
+  const user = document.getElementById("usuario").value;
+  if(user){
+    localStorage.setItem("usuario", user);
+    document.getElementById("login").style.display="none";
+  }
+}
+
+window.onload = ()=>{
+  const user = localStorage.getItem("usuario");
+  if(user){
+    document.getElementById("login").style.display="none";
+  }
+};
+
+// CARGAR DATOS
 fetch(url)
 .then(r=>r.json())
 .then(d=>{
   data = d.map(p=>{
-    let o = {};
+    let o={};
     Object.keys(p).forEach(k=>{
       o[k.trim().toLowerCase()] = p[k];
     });
@@ -147,7 +117,7 @@ fetch(url)
   });
 });
 
-// abrir categoria
+// ABRIR CATEGORIA
 function abrir(cat){
   document.getElementById("menu").style.display="none";
   document.getElementById("productos").style.display="flex";
@@ -160,20 +130,18 @@ function abrir(cat){
   render(f);
 }
 
-// volver
+// VOLVER
 function inicio(){
   document.getElementById("menu").style.display="flex";
   document.getElementById("productos").style.display="none";
   document.getElementById("volver").style.display="none";
 }
 
-// render
+// RENDER
 function render(lista){
-
   let html="";
 
   lista.forEach(p=>{
-
     const nombre = p.producto || "Producto";
     const stock = p.stock || 0;
     const img = p.imagen || "https://via.placeholder.com/150";
@@ -184,21 +152,17 @@ function render(lista){
 
     html+=`
       <div class="card">
-
         <img src="${img}">
-
         <h3>${nombre}</h3>
-
-        <p>📦 Stock: ${stock}</p>
+        <p style="color:${stock<=5?'red':'lime'};">📦 ${stock}</p>
 
         <p>Unidad: S/ ${unidad}</p>
         <p>Docena: S/ ${docena}</p>
         <p>Cajón: S/ ${cajon}</p>
 
-        <button onclick="vender('${nombre}','unidad')">Vender Unidad</button>
-        <button onclick="vender('${nombre}','docena')">Vender Docena</button>
-        <button onclick="vender('${nombre}','cajon')">Vender Cajón</button>
-
+        <button onclick="vender('${nombre}','UNIDAD')">Vender Unidad</button>
+        <button onclick="vender('${nombre}','DOCENA')">Vender Docena</button>
+        <button onclick="vender('${nombre}','CAJON')">Vender Cajón</button>
       </div>
     `;
   });
@@ -206,11 +170,16 @@ function render(lista){
   document.getElementById("productos").innerHTML = html;
 }
 
-// vender
+// VENDER
 function vender(prod,tipo){
+
+  const vendedor = localStorage.getItem("usuario") || "SinNombre";
+
   const link = FORM + "?" +
     ENTRY_PRODUCTO + "=" + encodeURIComponent(prod) +
-    "&entry.tipo=" + tipo;
+    "&" + ENTRY_TIPO + "=" + tipo +
+    "&" + ENTRY_CANTIDAD + "=1" +
+    "&" + ENTRY_VENDEDOR + "=" + encodeURIComponent(vendedor);
 
   window.open(link,"_blank");
 }
