@@ -13,14 +13,13 @@ body {background:#0b0b0b;color:white;font-family:Arial;margin:0;}
 .sub {color:gray;}
 
 #login {text-align:center;padding:20px;}
-#panelBtn {text-align:center;}
+#userInfo {text-align:center;margin-top:10px;color:lime;}
 
 #menu {display:flex;flex-wrap:wrap;justify-content:center;}
 .menu-card {
   width:40%;margin:10px;padding:10px;border-radius:15px;
   background:#111;text-align:center;
 }
-.menu-card img {width:100%;border-radius:10px;}
 
 #productos {display:none;flex-wrap:wrap;justify-content:center;}
 .card {
@@ -47,7 +46,9 @@ button {
   <button onclick="guardarUsuario()">Entrar</button>
 </div>
 
-<!-- BOTÓN PANEL -->
+<div id="userInfo"></div>
+
+<!-- PANEL BTN -->
 <div id="panelBtn" style="display:none;">
   <button onclick="abrirPanel()">⚙️ PANEL ADMIN</button>
 </div>
@@ -61,13 +62,16 @@ button {
 
 <!-- MENU -->
 <div id="menu">
-  <div class="menu-card" onclick="abrir('invierno')">❄️ Invierno</div>
-  <div class="menu-card" onclick="abrir('verano')">☀️ Verano</div>
-  <div class="menu-card" onclick="abrir('tecnologia')">💻 Tecnología</div>
+  <div class="menu-card" onclick="abrir('INVIERNO')">❄️ INVIERNO</div>
+  <div class="menu-card" onclick="abrir('VERANO')">☀️ VERANO</div>
+  <div class="menu-card" onclick="abrir('TECNOLOGIA')">💻 TECNOLOGÍA</div>
+  <div class="menu-card" onclick="abrir('OTONO')">🍂 OTOÑO</div>
+  <div class="menu-card" onclick="abrir('NAVIDAD')">🎄 NAVIDAD</div>
+  <div class="menu-card" onclick="abrir('JUGUETES')">🧸 JUGUETES</div>
+  <div class="menu-card" onclick="abrir('OTROS')">📦 OTROS</div>
 </div>
 
 <div id="volver" onclick="inicio()">⬅ Volver</div>
-
 <div id="productos"></div>
 
 <!-- PANEL -->
@@ -131,7 +135,13 @@ window.onload = ()=>{
 
   if(user){
     document.getElementById("login").style.display="none";
-    if(admins.includes(user.toLowerCase())){
+
+    const esAdmin = admins.includes(user.toLowerCase());
+
+    document.getElementById("userInfo").innerText =
+      "Usuario: " + user + (esAdmin ? " (ADMIN)" : " (VENDEDOR)");
+
+    if(esAdmin){
       document.getElementById("panelBtn").style.display="block";
     }
   }
@@ -150,15 +160,16 @@ fetch(urlInv)
   });
 });
 
-// MENU
+// CATEGORÍAS (MAYÚSCULAS)
 function abrir(cat){
   document.getElementById("menu").style.display="none";
   document.getElementById("productos").style.display="flex";
   document.getElementById("volver").style.display="block";
 
-  let f = inventario.filter(p=>
-    (p.categoria||"").toLowerCase().includes(cat)
-  );
+  let f = inventario.filter(p=>{
+    const categoria = (p.categoria || "").toString().toUpperCase();
+    return categoria === cat.toUpperCase();
+  });
 
   render(f);
 }
@@ -234,9 +245,7 @@ function cargarDashboard(){
   fetch(urlVentas)
   .then(r=>r.json())
   .then(ventas=>{
-
-    let total=0, dinero=0;
-    let productos={}, dias={};
+    let total=0, dinero=0, productos={}, dias={};
 
     ventas.forEach(v=>{
       let prod=v.Producto?.toLowerCase();
@@ -263,7 +272,7 @@ function cargarDashboard(){
     });
 
     document.getElementById("totalVentas").innerText="Total: "+total;
-    document.getElementById("ganancias").innerText="S/ "+dinero;
+    document.getElementById("ganancias").innerText="Ganancias: S/ "+dinero;
 
     mostrarTop(productos);
     graficoDias(dias);
