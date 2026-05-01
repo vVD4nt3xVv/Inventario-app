@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A&T KAMIARA</title>
-    <!-- Aquí conectamos el archivo de estilos CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
 <!-- LOGIN -->
@@ -23,20 +21,21 @@
 
 <!-- APP -->
 <div id="app" style="display:none;">
-
     <div id="userInfo"></div>
 
     <div class="top-buttons">
       <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+      <button id="btnVerCarrito" onclick="verCarrito()" style="background:#28a745; width:auto; padding:8px 15px;">🛒 Carrito (0)</button>
       <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
     </div>
 
     <div id="portada">
-      <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG" alt="Portada">
+      <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
       <div class="titulo">CONTROL DE INVENTARIO</div>
       <div class="sub">-----------------------------------------------------------------------------------</div>
     </div>
 
+    <!-- Menú de Categorías -->
     <div id="menu" class="grid-menu">
       <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
       <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
@@ -44,44 +43,43 @@
       <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
     </div>
 
+    <!-- Contenedor de Productos -->
     <div id="productos"></div>
-    <!-- CARRITO -->
-<div id="carrito" style="display:none; padding:15px;">
-    <h2>CARRITO</h2>
-    <div id="lista-carrito">
-        <!-- Aquí se cargarán los productos seleccionados -->
-    </div>
 
-    <div class="resumen-total">
-        <div class="fila-resumen">
-            <span>DESCUENTO:</span>
-            <div class="input-desc">
-                <button class="btn-aplicar" onclick="aplicarDescuento()">Aplicar</button>
-                <input type="number" id="montoDescuento" value="0" step="0.1">
+    <!-- CARRITO -->
+    <div id="carrito" style="display:none; padding:15px;">
+        <h2>CARRITO</h2>
+        <div id="lista-carrito"></div>
+
+        <div class="resumen-total">
+            <div class="fila-resumen">
+                <span>DESCUENTO:</span>
+                <div class="input-desc">
+                    <button class="btn-aplicar" onclick="aplicarDescuento()">Aplicar</button>
+                    <input type="number" id="montoDescuento" value="0">
+                </div>
+            </div>
+            <div class="fila-resumen total-grande">
+                <span>TOTAL FINAL:</span>
+                <span id="precioTotalCarrito">S/ 0.00</span>
             </div>
         </div>
-        <div class="fila-resumen total-grande">
-            <span>TOTAL FINAL:</span>
-            <span id="precioTotalCarrito">S/ 0.00</span>
+
+        <div class="botones-carrito">
+            <button class="btn-volver" onclick="inicio()">⬅ Volver</button>
+            <button class="btn-pagar" onclick="pagar()">Pagar</button>
         </div>
     </div>
 
-    <div class="botones-carrito">
-        <button class="btn-volver" onclick="inicio()">⬅ Volver</button>
-        <button class="btn-pagar" onclick="pagar()">Pagar</button>
-    </div>
-</div>
-
+    <!-- Panel Admin -->
     <div id="panel">
       <h2>Panel Admin</h2>
       <button onclick="abrirFormulario()">➕ Agregar Producto</button>
       <button onclick="verVentas()">📊 Ver Ventas</button>
       <button onclick="inicio()">⬅ Volver</button>
     </div>
-
 </div>
 
-<!-- Aquí conectamos el archivo de lógica JavaScript al final del body -->
 <script src="app.js"></script>
 </body>
 </html>
