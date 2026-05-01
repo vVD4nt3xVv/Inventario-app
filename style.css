@@ -1,40 +1,52 @@
-:root { --primary: #5cb85c; --danger: #d9534f; --dark: #0b0b0b; --card: #161616; }
+:root { --primary: #5cb85c; --danger: #d9534f; --dark: #0b0b0b; --card: #161616; --blue: #0275d8; }
 body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
 
-#login { height: 100vh; display: flex; align-items: center; justify-content: center; background: #050505; }
-.login-box { background: #111; padding: 40px; border-radius: 25px; border: 1px solid #333; text-align: center; width: 85%; max-width: 350px; }
-.login-box input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; }
-.login-box button { width: 100%; padding: 15px; background: var(--primary); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; }
+/* LOGIN */
+#login-screen { height: 100vh; display: flex; align-items: center; justify-content: center; background: #000; }
+.login-box { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #333; text-align: center; width: 85%; max-width: 380px; }
+.login-box input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #444; background: #222; color: white; box-sizing: border-box; }
+.login-box button { width: 100%; padding: 12px; background: var(--primary); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
 
-#app { max-width: 480px; margin: auto; position: relative; min-height: 100vh; }
-#portada img { width: 100%; height: 200px; object-fit: cover; border-bottom: 3px solid var(--primary); }
-.titulo-app { text-align: center; font-size: 1.4em; font-weight: bold; margin: 15px 0; letter-spacing: 2px; color: var(--primary); }
-
-.header-actions { display: flex; justify-content: space-around; padding: 10px; }
-.header-actions button { background: #222; color: white; border: 1px solid #444; padding: 10px 20px; border-radius: 10px; cursor: pointer; }
-
-.grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-.menu-card { background: var(--card); border-radius: 20px; overflow: hidden; text-align: center; border: 1px solid #333; }
-.menu-card img { width: 100%; height: 110px; object-fit: cover; }
-
-.scroll-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; padding-bottom: 100px; }
-.product-card { background: var(--card); border-radius: 15px; padding: 10px; text-align: center; }
-.product-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; }
-
-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #111; }
-th, td { padding: 12px; text-align: center; font-size: 0.85em; border-bottom: 1px solid #222; }
-
-.footer-nav { 
-    position: fixed; bottom: 0; width: 100%; max-width: 480px; 
-    background: rgba(11, 11, 11, 0.98); display: grid; 
-    grid-template-columns: 1fr 1fr 1fr; padding: 20px 0; border-top: 1px solid #333; z-index: 100;
+/* BARRA SUPERIOR FIJA */
+.top-nav {
+    position: sticky; top: 0; background: rgba(11,11,11,0.95);
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    padding: 10px; border-bottom: 1px solid #333; z-index: 1000; align-items: center;
 }
-.btn-nav-izq { grid-column: 1; margin-left: 15px; background: var(--danger); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; }
-.btn-nav-der { grid-column: 3; margin-right: 15px; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; }
+.nav-col-izq { font-size: 11px; font-weight: bold; }
+.nav-col-cen { text-align: center; }
+.nav-col-der { text-align: right; }
+.btn-sm-red { background: var(--danger); border: none; color: white; font-size: 9px; padding: 4px 8px; border-radius: 4px; }
+.btn-sm-blue { background: var(--blue); border: none; color: white; font-size: 10px; padding: 6px; border-radius: 5px; font-weight: bold; }
+.btn-sm-green { background: var(--primary); border: none; color: white; font-size: 10px; padding: 6px; border-radius: 5px; }
 
-.total-box { text-align: right; font-size: 1.4em; padding: 20px; color: var(--primary); font-weight: bold; }
-.factura-box { background: white; color: black; padding: 20px; border-radius: 5px; font-family: monospace; font-size: 12px; }
-.ws-box { margin-top: 15px; text-align: center; }
-.ws-box input { width: 90%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #222; color: white; }
+/* STOCK INFO BAR */
+.stock-info-bar {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    background: #222; padding: 8px; border-radius: 8px;
+    font-size: 11px; font-weight: bold; margin-bottom: 10px; text-align: center;
+}
 
-#toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); padding: 10px 25px; border-radius: 50px; display: none; z-index: 1000; }
+/* BOTONES INFERIORES */
+.footer-nav {
+    position: fixed; bottom: 0; width: 100%; max-width: 480px;
+    background: rgba(0,0,0,0.9); display: grid; grid-template-columns: 1fr 1fr 1fr;
+    padding: 15px 0; border-top: 1px solid #333; z-index: 1000;
+}
+.btn-nav-izq { grid-column: 1; margin-left: 15px; background: #444; color: white; border: none; padding: 12px; border-radius: 10px; }
+.btn-nav-der { grid-column: 3; margin-right: 15px; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; }
+
+/* TIENDA Y SCROLL */
+.grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
+.menu-card { background: var(--card); border-radius: 15px; overflow: hidden; text-align: center; border: 1px solid #222; }
+.menu-card img { width: 100%; height: 100px; object-fit: cover; }
+.scroll-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; padding-bottom: 80px; }
+.product-card { background: var(--card); border-radius: 12px; padding: 8px; text-align: center; }
+.product-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; }
+
+/* VOUCHER */
+.factura-box { background: white; color: black; padding: 20px; font-family: monospace; border-radius: 5px; }
+.ws-input-container { text-align: center; margin-top: 15px; }
+.ws-input-container input { width: 90%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; }
+
+#toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: var(--primary); padding: 8px 20px; border-radius: 20px; display: none; z-index: 2000; font-size: 12px; }
