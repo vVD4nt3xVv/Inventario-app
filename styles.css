@@ -1,67 +1,18 @@
-body {
-    background: linear-gradient(135deg,#0b0b0b,#1a1a1a);
-    color: white;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    max-width: 480px;
-    margin: auto;
-    font-size: 15px;
+body { background: #0b0b0b; color: white; font-family: Arial; margin: 0; }
+#login { display: flex; height: 100vh; justify-content: center; align-items: center; }
+.login-box { background: #111; padding: 20px; border-radius: 15px; text-align: center; width: 80%; }
+.login-box input { width: 100%; padding: 10px; margin: 5px 0; background: #222; border: none; color: white; }
+.login-box button { width: 100%; padding: 10px; background: red; color: white; border: none; font-weight: bold; }
+
+.grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
+.menu-card { background: #111; border-radius: 10px; text-align: center; overflow: hidden; }
+.menu-card img { width: 100%; height: 100px; object-fit: cover; }
+
+.caja-descuento { 
+    display: flex; justify-content: space-between; align-items: center; 
+    background: #222; padding: 10px; border-radius: 8px; margin: 15px 0; 
 }
+.grupo-input input { width: 60px; background: #000; color: lime; border: 1px solid #444; padding: 5px; text-align: center; }
+.grupo-input button { background: #444; color: white; border: none; padding: 5px; }
 
-/* LOGIN */
-#login { display: flex; align-items: center; justify-content: center; height: 100vh; }
-.login-box { background: #111; padding: 20px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; }
-.login-box input { width: 100%; padding: 12px; margin: 6px 0; border: none; border-radius: 10px; background: #222; color: white; }
-.login-box button { width: 100%; background: red; color: white; padding: 12px; border: none; border-radius: 10px; font-weight: bold; }
-
-/* HEADER & NAV */
-.header-app { display: flex; justify-content: space-between; align-items: center; padding: 10px; }
-#userInfo { font-weight: bold; font-size: 14px; }
-.top-buttons { display: flex; justify-content: center; gap: 10px; margin: 10px; }
-.btn-salir { background: red; padding: 8px 18px; border-radius: 8px; color: white; border: none; }
-.btn-admin { background: #007bff; padding: 8px 18px; border-radius: 8px; color: white; border: none; display: none; }
-
-/* GRID MENU & CARDS */
-.grid-menu { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; padding: 10px; }
-.menu-card { background: #111; border-radius: 15px; overflow: hidden; text-align: center; cursor: pointer; }
-.menu-card img { width: 100%; height: 120px; object-fit: cover; }
-#productos { display: none; grid-template-columns: repeat(2,1fr); gap: 10px; padding: 10px; }
-.card { background: #111; border-radius: 15px; padding: 10px; text-align: center; cursor: pointer; }
-.card img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; }
-
-/* DETALLES */
-.detalle-img { width: 100%; border-radius: 15px; }
-.fila-opciones { display: flex; justify-content: space-between; background: #111; padding: 12px; border-radius: 10px; margin: 10px 0; font-size: 13px; }
-.stock { color: #00ff88; font-weight: bold; }
-.total { color: #00aaff; font-weight: bold; }
-table { width: 100%; background: #111; border-radius: 10px; text-align: center; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 8px; border-bottom: 1px solid #333; font-size: 13px; }
-
-/* CARRITO & DESCUENTO */
-#seccion-carrito { display: none; padding: 15px; }
-.carrito-header { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1.2fr; font-size: 11px; color: #aaa; border-bottom: 1px solid #333; padding-bottom: 5px; }
-.item-carrito { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1.2fr; align-items: center; padding: 12px 5px; background: #111; margin-bottom: 5px; border-radius: 8px; border-left: 3px solid red; font-size: 13px; }
-
-.caja-descuento { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 10px; border-radius: 8px; border: 1px solid #444; margin: 15px 0; }
-.caja-descuento-inputs input { width: 70px; background: transparent; border: none; border-right: 1px solid #444; color: #00ff88; text-align: center; font-weight: bold; outline: none; }
-.caja-descuento-inputs button { background: transparent; color: white; border: none; padding: 0 10px; font-weight: bold; cursor: pointer; }
-
-.cart-resumen { background: #111; padding: 15px; border-radius: 15px; }
-.total-fila { display: flex; justify-content: space-between; margin-bottom: 5px; }
-.total-final { font-size: 18px; font-weight: bold; color: #00aaff; border-top: 1px solid #333; padding-top: 10px; }
-
-/* NOTIFICACIONES */
-#toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 350px; }
-.toast { padding: 12px; border-radius: 8px; color: white; margin-bottom: 10px; text-align: center; font-weight: bold; animation: slideDown 0.4s ease; }
-.toast.success { background: #28a745; }
-.toast.error { background: #dc3545; }
-
-/* HELPER CLASSES */
-.txt-center { text-align: center; }
-.txt-right { text-align: right; }
-.txt-grey { color: #aaa; }
-.btn-confirmar { background: #28a745; width: 100%; padding: 15px; border-radius: 10px; border: none; color: white; font-weight: bold; margin-top: 10px; }
-.btn-volver { background: #333; width: 100%; padding: 12px; border-radius: 10px; border: none; color: white; margin-top: 10px; }
-button { cursor: pointer; }
-
-@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.total-final { font-size: 1.5em; color: #00aaff; border-top: 1px solid #333; padding-top: 10px; }
