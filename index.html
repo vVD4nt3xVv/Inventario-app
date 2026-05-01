@@ -205,17 +205,17 @@ button {
   font-size:15px;
 }
 
-h2 {
-  text-align:center;
-}
+h2 {text-align:center;}
 
 #panel {display:none;padding:20px;}
+
+/* NUEVO */
+#carritoVista {display:none;padding:10px;}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div id="login">
   <div class="login-box">
     <h3>Bienvenido</h3>
@@ -226,31 +226,29 @@ h2 {
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
 <div id="userInfo"></div>
 
 <div class="top-buttons">
   <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-  <button style="background:#00c853;" onclick="verCarrito()">🛒</button>
+  <button style="background:green;" onclick="verCarrito()">🛒</button>
   <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
 </div>
 
 <div id="portada">
   <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
   <div class="titulo">CONTROL DE INVENTARIO</div>
-  <div class="sub">-----------------------------------------------------------------------------------</div>
+  <div class="sub">---</div>
 </div>
 
 <div id="menu" class="grid-menu">
   <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
   <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
-  <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
-  <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
 </div>
 
 <div id="productos"></div>
+<div id="carritoVista"></div>
 
 <div id="panel">
   <h2>Panel Admin</h2>
@@ -264,53 +262,27 @@ h2 {
 <script>
 
 // 🔥 NUEVO
-let carrito = [];
-let detalleActual = [];
-
-// TODO TU CÓDIGO ORIGINAL SIGUE IGUAL...
-
-// SOLO AGREGO FUNCIONES NUEVAS ABAJO
-
-function agregarCarrito(){
-  const radios=document.getElementsByName("prodSelect");
-  let index=-1;
-
-  radios.forEach((r,i)=>{ if(r.checked) index=i; });
-
-  if(index===-1){
-    alert("Selecciona producto");
-    return;
-  }
-
-  const item=detalleActual[index];
-  carrito.push({...item,cantidad:1});
-
-  alert("Producto agregado");
-}
+let carrito=[];
 
 function verCarrito(){
 
-  let html=`<h2 style="text-align:center;">🛒 Carrito</h2>`;
+  productos.style.display="none";
+  menu.style.display="none";
+  carritoVista.style.display="block";
+
+  let html=`<h2>🛒 Carrito</h2>`;
 
   if(carrito.length===0){
     html+=`<p style="text-align:center;">Carrito vacío</p>
-    <button onclick="inicio()">⬅ Volver</button>`;
-    productos.innerHTML=html;
+    <button onclick="cerrarCarrito()">⬅ Volver</button>`;
+    carritoVista.innerHTML=html;
     return;
   }
 
   let total=0;
 
   html+=`<table>
-  <tr>
-  <th>Producto</th>
-  <th>Talla</th>
-  <th>Color</th>
-  <th>Cant</th>
-  <th>Precio</th>
-  <th>Sub</th>
-  <th></th>
-  </tr>`;
+  <tr><th>Talla</th><th>Color</th><th>Cant</th><th>Total</th></tr>`;
 
   carrito.forEach((c,i)=>{
     let precio=(c.cantidad>=12)?c.docena:c.unidad;
@@ -319,67 +291,41 @@ function verCarrito(){
 
     html+=`
     <tr>
-    <td>${c.producto}</td>
-    <td>${c.talla}</td>
-    <td>${c.color}</td>
-    <td>
-      <button onclick="restar(${i})">-</button>
-      ${c.cantidad}
-      <button onclick="sumar(${i})">+</button>
-    </td>
-    <td>S/ ${precio}</td>
-    <td>S/ ${sub.toFixed(2)}</td>
-    <td><button onclick="eliminarItem(${i})">❌</button></td>
+      <td>${c.talla}</td>
+      <td>${c.color}</td>
+      <td>
+        <button onclick="restar(${i})">-</button>
+        ${c.cantidad}
+        <button onclick="sumar(${i})">+</button>
+      </td>
+      <td>S/ ${sub}</td>
     </tr>`;
   });
 
   html+=`</table>
 
-  <div style="text-align:center;margin-top:10px;">
-    <input id="descuento" type="number" placeholder="Descuento">
-    <button onclick="aplicarDescuento()">Aplicar</button>
-  </div>
+  <input id="desc" placeholder="Descuento">
+  <button onclick="aplicarDescuento()">Aplicar</button>
 
-  <h3 style="text-align:center;">
-  TOTAL: S/ <span id="totalFinal">${total.toFixed(2)}</span>
-  </h3>
+  <h3>TOTAL: S/ <span id="totalFinal">${total}</span></h3>
 
-  <button onclick="inicio()">⬅ Volver</button>
-  <button style="background:#00c853;" onclick="comprar()">COMPRAR</button>`;
+  <button onclick="cerrarCarrito()">⬅ Volver</button>`;
 
-  productos.innerHTML=html;
+  carritoVista.innerHTML=html;
 }
 
-function sumar(i){
-  carrito[i].cantidad++;
-  verCarrito();
+function cerrarCarrito(){
+  carritoVista.style.display="none";
+  productos.style.display="grid";
 }
 
-function restar(i){
-  carrito[i].cantidad--;
-  if(carrito[i].cantidad<=0) carrito.splice(i,1);
-  verCarrito();
-}
-
-function eliminarItem(i){
-  carrito.splice(i,1);
-  verCarrito();
-}
+function sumar(i){carrito[i].cantidad++;verCarrito();}
+function restar(i){carrito[i].cantidad--;if(carrito[i].cantidad<=0)carrito.splice(i,1);verCarrito();}
 
 function aplicarDescuento(){
-  let total=parseFloat(document.getElementById("totalFinal").innerText);
-  let d=parseFloat(document.getElementById("descuento").value)||0;
-
-  if(d>total)d=total;
-
-  document.getElementById("totalFinal").innerText=(total-d).toFixed(2);
-}
-
-function comprar(){
-  let total=parseFloat(document.getElementById("totalFinal").innerText)||0;
-  alert("Venta S/ "+total);
-  carrito=[];
-  inicio();
+  let t=parseFloat(totalFinal.innerText);
+  let d=parseFloat(desc.value)||0;
+  totalFinal.innerText=(t-d);
 }
 
 </script>
