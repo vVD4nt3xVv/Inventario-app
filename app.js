@@ -1,141 +1,216 @@
 const usuariosSistema = { luis:"123", katy:"123", katherine:"123", richard:"123", dante:"admin123" };
-let inventario = [], carrito = [];
+const admins = ["dante"];
+let inventario = [];
+let carrito = [];
 
-function showToast(msj, tipo = "success") {
-    const container = document.getElementById("toast-container");
-    const div = document.createElement("div");
-    div.className = "toast";
-    if(tipo === "error") div.style.background = "#dc3545";
-    div.innerText = msj;
-    container.appendChild(div);
-    setTimeout(() => div.remove(), 2500);
-}
-
+// LOGIN Y SESIÓN
 function guardarUsuario(){
-    const u = document.getElementById("usuario").value.toLowerCase();
-    const p = document.getElementById("password").value;
-    if(usuariosSistema[u] === p){
-        localStorage.setItem("user_kamiara", u);
-        location.reload();
-    } else {
-        alert("Datos incorrectos");
-    }
+  const user = document.getElementById("usuario").value.toLowerCase();
+  const pass = document.getElementById("password").value;
+  if(!usuariosSistema[user]) return document.getElementById("errorLogin").innerText="Usuario no registrado";
+  if(usuariosSistema[user]!==pass) return document.getElementById("errorLogin").innerText="Contraseña incorrecta";
+  localStorage.setItem("usuario",user);
+  location.reload();
 }
 
-function cerrarSesion(){ localStorage.removeItem("user_kamiara"); location.reload(); }
+function cerrarSesion(){ localStorage.removeItem("usuario"); location.reload(); }
 
-window.onload = () => {
-    const user = localStorage.getItem("user_kamiara");
-    if(user){
-        document.getElementById("login").style.display = "none";
-        document.getElementById("app").style.display = "flex";
-        document.getElementById("userInfo").innerText = "USUARIO: " + user.toUpperCase();
-        cargarDatos();
-    }
+window.onload=()=>{
+  const user = localStorage.getItem("usuario");
+  document.getElementById("login").style.display = user ? "none" : "flex";
+  document.getElementById("app").style.display = user ? "block" : "none";
+  if(user){
+    document.getElementById("userInfo").innerHTML = `USUARIO: ${user.toUpperCase()}`;
+    if(admins.includes(user)) document.getElementById("panelBtn").style.display = "inline-block";
+    cargarDatos();
+  }
 };
 
 function cargarDatos() {
-    fetch("https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO")
-    .then(r => r.json())
-    .then(data => {
-        inventario = data.map(p => ({
-            id: p.ID, producto: p.PRODUCTO, categoria: p.CATEGORIA.toUpperCase(),
-            talla: p.TALLA, color: p.COLOR, stock: parseInt(p.STOCK),
-            unidad: parseFloat(p["P.UNIDAD"]), docena: parseFloat(p["P.DOCENA"]), imagen: p.IMAGEN
-        }));
+    const urlInv = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
+    fetch(urlInv).then(r=>r.json()).then(d=>{
+      inventario = d.map(p=>{
+        let o = {};
+        Object.keys(p).forEach(k=>o[k.toLowerCase().trim()]=p[k]);
+        return {
+          id:o.id, producto:o.producto, categoria:(o.categoria||"").toUpperCase(),
+          talla:o.talla, color:o.color, stock:parseInt(o.stock)||0,
+          unidad:parseFloat(o["p.unidad"]), docena:parseFloat(o["p.docena"]), imagen:o.imagen
+        };
+      });
     });
 }
 
-function abrir(cat) {
+// NAVEGACIÓN
+function abrir(cat){
+  ocultarTodo();
+  document.getElementById("productos").style.display = "grid";
+  const filtrados = inventario.filter(p => p.categoria === cat && p.stock > 0);
+  const unicos = {};
+  filtrados.forEach(p => { if(!unicos[p.id]) unicos[p.id] = p; });
+  
+  let html = "";
+  Object.values(unicos).forEach(p => {
+    html += `
+    <div class="card" onclick="verProducto('${p.id}')">
+      <img src="${p.imagen}">
+      <h3>${p.producto}</h3>
+      <p style="color:lime;">S/ ${p.unidad}</p>
+    </div>`;
+  });
+  document.getElementById("productos").innerHTML = html + `<button onclick="inicio()" style="grid-column: span 2; background:#333;">⬅ Volver</button>`;
+}
+
+function inicio(){
+  ocultarTodo();
+  document.getElementById("menu").style.display = "grid";
+}
+
+function ocultarTodo() {
     document.getElementById("menu").style.display = "none";
-    document.getElementById("productos").style.display = "grid";
-    const filtrados = inventario.filter(p => p.categoria === cat);
-    const unicos = {}; 
-    filtrados.forEach(p => { if(!unicos[p.id]) unicos[p.id] = p; });
-
-    let html = "";
-    Object.values(unicos).forEach(p => {
-        html += `<div class="card" onclick="verProducto('${p.id}')">
-            <img src="${p.imagen}">
-            <div style="padding:10px;">
-                <h3 style="font-size:13px; margin:0;">${p.producto}</h3>
-                <p style="color:lime; margin:5px 0 0;">S/ ${p.unidad}</p>
-            </div>
-        </div>`;
-    });
-    document.getElementById("productos").innerHTML = html + `<button onclick="inicio()" style="grid-column:span 2; padding:10px; background:#333; color:white; border:none; border-radius:8px;">⬅ VOLVER</button>`;
+    document.getElementById("productos").style.display = "none";
+    document.getElementById("panel").style.display = "none";
+    document.getElementById("seccion-carrito").style.display = "none";
 }
 
-function verProducto(id) {
-    const variantes = inventario.filter(v => v.id == id);
-    const p = variantes[0];
-    const tallas = [...new Set(variantes.map(v => v.talla))];
+// DETALLE PRODUCTO
+function verProducto(id){
+  const variantes = inventario.filter(p => p.id == id);
+  const p = variantes[0];
+  const tallas = [...new Set(variantes.map(v => v.talla))];
+  const stockTotal = variantes.reduce((a,b) => a + b.stock, 0);
 
-    document.getElementById("productos").innerHTML = `
-        <div class="detalle-container">
-            <img src="${p.imagen}">
-            <h2 style="margin:10px 0;">${p.producto}</h2>
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <div style="flex:1;">Talla: <select id="selTalla" style="width:100%; padding:8px;" onchange="actualizarColores('${id}')">${tallas.map(t => `<option value="${t}">${t}</option>`).join("")}</select></div>
-                <div style="flex:1;">Color: <select id="selColor" style="width:100%; padding:8px;"></select></div>
-            </div>
-            <button onclick="agregarAlCarrito('${id}')" style="width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:10px; font-weight:bold;">AÑADIR AL CARRITO</button>
-            <button onclick="inicio()" style="width:100%; padding:10px; background:none; color:gray; border:none; margin-top:10px;">⬅ Volver</button>
-        </div>`;
-    actualizarColores(id);
+  document.getElementById("productos").innerHTML = `
+    <div>
+      <img class="detalle-img" src="${p.imagen}">
+      <h2>${p.producto}</h2>
+      <div class="fila-opciones">
+        <div>🧵 TALLA <select id="tallaSelect" onchange="cambiarTalla('${id}')">${tallas.map(t=>`<option value="${t}">${t}</option>`).join("")}</select></div>
+        <div>🎨 COLOR <select id="colorSelect" onchange="refrescarStock('${id}')"></select></div>
+      </div>
+      <div class="fila-opciones">
+        <div>📦 STOCK <span class="stock" id="stockTalla">0</span></div>
+        <div>📊 TOTAL <span class="total">${stockTotal}</span></div>
+      </div>
+      <button style="background:#28a745; font-weight:bold;" onclick="añadir('${id}')">🛒 AÑADIR AL CARRITO</button>
+      <table id="tablaDetalle"></table>
+      <button style="background:#333;" onclick="abrir('${p.categoria}')">⬅ Volver</button>
+    </div>`;
+  cambiarTalla(id);
 }
 
-function actualizarColores(id) {
-    const t = document.getElementById("selTalla").value;
-    const colores = inventario.filter(v => v.id == id && v.talla == t);
-    document.getElementById("selColor").innerHTML = colores.map(c => `<option value="${c.color}">${c.color} (Stock: ${c.stock})</option>`).join("");
+function cambiarTalla(id){
+  const talla = document.getElementById("tallaSelect").value;
+  const filtrados = inventario.filter(p => p.id == id && p.talla == talla);
+  const selectColor = document.getElementById("colorSelect");
+  selectColor.innerHTML = filtrados.map(v => `<option value="${v.color}">${v.color}</option>`).join("");
+  
+  let filas = `<tr><th>COLOR</th><th>STOCK</th><th>P.UNID</th></tr>`;
+  filtrados.forEach(v => { filas += `<tr><td>${v.color}</td><td>${v.stock}</td><td>S/ ${v.unidad}</td></tr>`; });
+  document.getElementById("tablaDetalle").innerHTML = filas;
+  refrescarStock(id);
 }
 
-function agregarAlCarrito(id) {
-    const t = document.getElementById("selTalla").value;
-    const c = document.getElementById("selColor").value;
+function refrescarStock(id) {
+    const t = document.getElementById("tallaSelect").value;
+    const c = document.getElementById("colorSelect").value;
     const item = inventario.find(p => p.id == id && p.talla == t && p.color == c);
-    
-    const existe = carrito.find(x => x.id == id && x.talla == t && x.color == c);
-    if(existe) existe.cantidad++;
-    else carrito.push({...item, cantidad: 1});
+    document.getElementById("stockTalla").innerText = item ? item.stock : 0;
+}
 
-    showToast("Añadido al carrito");
+// CARRITO Y DESCUENTO POR DOCENA POR ID
+function añadir(id) {
+    const t = document.getElementById("tallaSelect").value;
+    const c = document.getElementById("colorSelect").value;
+    const original = inventario.find(p => p.id == id && p.talla == t && p.color == c);
+
+    if(!original || original.stock <= 0) return alert("Sin stock");
+
+    const enCarrito = carrito.find(x => x.id == id && x.talla == t && x.color == c);
+    if(enCarrito) {
+        if(enCarrito.cantidad >= original.stock) return alert("Límite de stock");
+        enCarrito.cantidad++;
+    } else {
+        carrito.push({...original, cantidad: 1});
+    }
     actualizarContador();
+    alert("Añadido!");
 }
 
 function actualizarContador() {
-    const n = carrito.reduce((a, b) => a + b.cantidad, 0);
-    document.getElementById("btnVerCarrito").innerText = `🛒 Carrito (${n})`;
+    const total = carrito.reduce((a, b) => a + b.cantidad, 0);
+    document.getElementById("btnVerCarrito").innerText = `🛒 Carrito (${total})`;
 }
 
-function verCarrito() {
-    document.getElementById("menu").style.display = "none";
-    document.getElementById("productos").style.display = "none";
-    document.getElementById("carrito").style.display = "block";
+function mostrarCarrito() {
+    ocultarTodo();
+    document.getElementById("seccion-carrito").style.display = "block";
     renderCarrito();
 }
 
 function renderCarrito() {
-    const lista = document.getElementById("lista-carrito");
-    let html = "", total = 0;
-    carrito.forEach((item, i) => {
-        const precio = item.cantidad >= 12 ? item.docena : item.unidad;
-        const sub = precio * item.cantidad;
-        total += sub;
-        html += `<div class="item-carrito">
-            <div style="display:flex; justify-content:space-between;"><b>${item.producto}</b> <span onclick="borrar(${i})" style="color:red; cursor:pointer;">✕</span></div>
-            <div class="grid-carrito">
-                <span>${item.talla} | ${item.color}</span>
-                <span>Cant: ${item.cantidad}</span>
-                <span>S/ ${sub.toFixed(2)}</span>
+    const div = document.getElementById("lista-carrito");
+    let html = "", totalGral = 0;
+
+    // Calcular cuántas unidades hay en TOTAL por cada ID
+    const totalesPorID = {};
+    carrito.forEach(item => {
+        totalesPorID[item.id] = (totalesPorID[item.id] || 0) + item.cantidad;
+    });
+
+    carrito.forEach((item, index) => {
+        // Si la suma de todas las variantes del mismo ID >= 12, se cobra precio docena
+        const aplicaDocena = totalesPorID[item.id] >= 12;
+        const precio = aplicaDocena ? item.docena : item.unidad;
+        const subtotal = precio * item.cantidad;
+        totalGral += subtotal;
+
+        html += `
+        <div class="item-carrito">
+            <div style="display:flex; justify-content:space-between;">
+                <b>${item.producto}</b>
+                <span style="color:red;" onclick="eliminar(${index})">✕</span>
+            </div>
+            <div style="font-size:12px; color:gray;">${item.talla} | ${item.color} ${aplicaDocena ? '⭐(Docena)' : ''}</div>
+            <div class="controles-carrito">
+                <div>
+                    <button class="btn-cant" onclick="sumar(${index}, -1)">-</button>
+                    <span>${item.cantidad}</span>
+                    <button class="btn-cant" onclick="sumar(${index}, 1)">+</button>
+                </div>
+                <b>S/ ${subtotal.toFixed(2)}</b>
             </div>
         </div>`;
     });
-    lista.innerHTML = html || "<p style='text-align:center; color:gray;'>Carrito vacío</p>";
-    document.getElementById("precioTotalCarrito").innerText = `S/ ${total.toFixed(2)}`;
+
+    div.innerHTML = html || "<p style='text-align:center;'>Carrito vacío</p>";
+    document.getElementById("totalCarrito").innerText = `S/ ${totalGral.toFixed(2)}`;
 }
 
-function borrar(i) { carrito.splice(i, 1); renderCarrito(); actualizarContador(); showToast("Eliminado", "error"); }
-function inicio() { location.reload(); }
-function pagar() { alert("Pedido enviado"); carrito = []; inicio(); }
+function sumar(idx, n) {
+    const item = carrito[idx];
+    const original = inventario.find(p => p.id == item.id && p.talla == item.talla && p.color == item.color);
+    if(n > 0 && item.cantidad >= original.stock) return;
+    item.cantidad += n;
+    if(item.cantidad <= 0) return eliminar(idx);
+    renderCarrito();
+    actualizarContador();
+}
+
+function eliminar(idx) {
+    carrito.splice(idx, 1);
+    renderCarrito();
+    actualizarContador();
+}
+
+function finalizarPedido() {
+    if(carrito.length === 0) return;
+    alert("Pedido realizado");
+    carrito = [];
+    actualizarContador();
+    inicio();
+}
+
+function abrirPanel(){ ocultarTodo(); document.getElementById("panel").style.display="block"; }
+function abrirFormulario(){ window.open("https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform"); }
+function verVentas(){ window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE"); }
