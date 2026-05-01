@@ -29,8 +29,7 @@
 
     <div class="top-buttons">
       <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-      <!-- El panel ahora se abre en pestaña nueva -->
-      <button class="btn-admin" id="panelBtn" onclick="abrirPanelNuevaPestaña()" style="display:none;">Panel</button>
+      <button class="btn-admin" id="panelBtn" onclick="abrirPanelInterno()" style="display:none;">Panel</button>
       <button class="btn-carrito-top" onclick="verCarrito()">🛒 Carrito (<span id="cart-count">0</span>)</button>
     </div>
 
@@ -40,13 +39,27 @@
           <div class="titulo">CONTROL DE INVENTARIO</div>
           <div class="sub">--------------------------------------------------</div>
         </div>
+        
         <div id="menu" class="grid-menu">
           <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
           <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
           <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
           <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
         </div>
-        <div id="productos"></div>
+
+        <div id="productos" style="display:none;"></div>
+    </div>
+
+    <!-- PANEL ADMIN INTERNO -->
+    <div id="panel-admin-view" style="display:none; padding:20px; text-align:center;">
+        <h2>⚙️ Gestión Administrativa</h2>
+        <div class="panel-buttons">
+            <button class="btn-panel-opt" onclick="abrirFormulario()">➕ Agregar Producto</button>
+            <button class="btn-panel-opt" onclick="verVentas()">📊 Ver Registro de Ventas</button>
+        </div>
+        <div class="footer-btns">
+            <button class="btn-rojo" onclick="inicio()">Volver</button>
+        </div>
     </div>
 
     <div id="carrito-view" style="display:none; padding:15px;">
