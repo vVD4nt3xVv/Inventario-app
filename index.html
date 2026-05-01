@@ -165,6 +165,10 @@ body {
   flex:1;
 }
 
+input[type="radio"] {
+  accent-color:#00ff88;
+}
+
 /* COLORES */
 .stock {
   color:#00ff88;
@@ -189,11 +193,6 @@ select {
   padding:6px;
   margin-left:5px;
   font-size:14px;
-}
-
-/* RADIO */
-input[type="radio"] {
-  accent-color:#00ff88;
 }
 
 /* TABLA */
@@ -234,7 +233,7 @@ h2 {
   bottom:20px;
   left:50%;
   transform:translateX(-50%);
-  background:#222;
+  background:#111;
   padding:10px 20px;
   border-radius:10px;
   opacity:0;
@@ -488,9 +487,9 @@ function cambiarTalla(id){
 }
 
 // NUEVAS FUNCIONES
-function mostrarToast(msg){
+function mostrarToast(msg,color="green"){
   const t=document.getElementById("toast");
-  t.innerText=msg;
+  t.innerHTML=`<b style="color:${color}">${msg}</b>`;
   t.classList.add("show");
   setTimeout(()=>t.classList.remove("show"),2000);
 }
@@ -501,14 +500,14 @@ function agregarCarrito(){
   radios.forEach((r,i)=>{ if(r.checked) index=i; });
 
   if(index===-1){
-    mostrarToast("Selecciona producto");
+    mostrarToast("Selecciona producto","red");
     return;
   }
 
   const item=detalleActual[index];
   carrito.push({...item,cantidad:1});
 
-  mostrarToast(item.producto+" agregado");
+  mostrarToast("Producto agregado","green");
 }
 
 function verCarrito(){
@@ -539,13 +538,11 @@ function verCarrito(){
 
   carrito.forEach((c,i)=>{
 
-    let precio=c.unidad;
-    if(c.cantidad>=12){
-      precio=c.docena/12;
-    }
+    let precio = (c.cantidad>=12)?c.docena:c.unidad;
+    let tipo = (c.cantidad>=12)?"DOCENA":"UNIDAD";
 
-    const subtotal=precio*c.cantidad;
-    total+=subtotal;
+    const subtotal = precio * c.cantidad;
+    total += subtotal;
 
     html+=`
     <tr>
@@ -553,28 +550,29 @@ function verCarrito(){
     <td>${c.talla}</td>
     <td>${c.color}</td>
     <td>
-    <button onclick="restar(${i})">-</button>
-    ${c.cantidad}
-    <button onclick="sumar(${i})">+</button>
+      <button onclick="restar(${i})">-</button>
+      ${c.cantidad}
+      <button onclick="sumar(${i})">+</button>
     </td>
-    <td>S/ ${subtotal.toFixed(2)}</td>
+    <td>S/ ${precio}<br><small>${tipo}</small></td>
     <td><button onclick="eliminarItem(${i})">❌</button></td>
     </tr>`;
   });
 
   html+=`</table>
 
-  <p style="text-align:center;">P.UNIDAD → cambia a DOCENA desde 12</p>
-
-  <div style="text-align:center;">
-  Descuento: <input id="descuento" type="number" value="0" style="width:80px;">
+  <div style="text-align:center;margin-top:10px;">
+    Descuento:
+    <input id="descuento" type="number" value="0" style="width:80px;">
   </div>
 
-  <h3 style="text-align:center;">TOTAL: S/ ${total.toFixed(2)}</h3>
+  <h3 style="text-align:center;margin-top:10px;">
+    TOTAL: S/ ${total.toFixed(2)}
+  </h3>
 
   <div class="fila-botones">
-  <button onclick="inicio()">⬅ Volver</button>
-  <button style="background:#00c853;" onclick="comprar()">COMPRAR</button>
+    <button onclick="inicio()">⬅ Volver</button>
+    <button style="background:#00c853;" onclick="comprar()">COMPRAR</button>
   </div>`;
 
   productos.innerHTML=html;
@@ -589,12 +587,14 @@ function restar(i){
   carrito[i].cantidad--;
   if(carrito[i].cantidad<=0){
     carrito.splice(i,1);
+    mostrarToast("Producto eliminado","red");
   }
   verCarrito();
 }
 
 function eliminarItem(i){
   carrito.splice(i,1);
+  mostrarToast("Producto eliminado","red");
   verCarrito();
 }
 
@@ -603,16 +603,14 @@ function comprar(){
   const desc=parseFloat(document.getElementById("descuento").value)||0;
 
   carrito.forEach(c=>{
-    let precio=c.unidad;
-    if(c.cantidad>=12){
-      precio=c.docena/12;
-    }
+    let precio=(c.cantidad>=12)?c.docena:c.unidad;
     total+=precio*c.cantidad;
   });
 
   total-=desc;
+  if(total<0) total=0;
 
-  mostrarToast("Venta S/ "+total.toFixed(2));
+  mostrarToast("Venta S/ "+total.toFixed(2),"green");
 
   carrito=[];
   inicio();
