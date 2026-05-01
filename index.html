@@ -155,45 +155,30 @@ body {
   flex:1;
 }
 
-/* NUEVO */
+/* BOTONES */
 .fila-botones {
   display:flex;
   justify-content:space-between;
   gap:10px;
 }
-
 .fila-botones button {
   width:auto;
   flex:1;
 }
 
 /* COLORES */
-.stock {
-  color:#00ff88;
-  font-weight:bold;
-  margin-left:5px;
-  font-size:15px;
-}
+.stock {color:#00ff88;font-weight:bold;}
+.total {color:#00aaff;font-weight:bold;}
 
-.total {
-  color:#00aaff;
-  font-weight:bold;
-  margin-left:5px;
-  font-size:15px;
-}
-
-/* SELECT */
 select {
   background:#222;
   color:white;
   border:none;
   border-radius:8px;
   padding:6px;
-  margin-left:5px;
-  font-size:14px;
 }
 
-/* RADIO VERDE */
+/* RADIO */
 input[type="radio"] {
   accent-color:#00ff88;
 }
@@ -206,11 +191,8 @@ table {
   border-radius:10px;
   text-align:center;
 }
-
-th,td {
-  padding:8px;
-  font-size:14px;
-}
+th {color:#00ff88;}
+th,td {padding:8px;}
 
 /* BOTONES */
 button {
@@ -221,14 +203,7 @@ button {
   border-radius:10px;
   background:red;
   color:white;
-  font-size:15px;
 }
-
-h2 {
-  text-align:center;
-}
-
-#panel {display:none;padding:20px;}
 
 /* TOAST */
 #toast {
@@ -237,31 +212,26 @@ h2 {
   left:50%;
   transform:translateX(-50%);
   background:#222;
-  padding:12px 20px;
+  padding:12px;
   border-radius:10px;
   opacity:0;
-  transition:0.3s;
-  z-index:999;
 }
 #toast.show {opacity:1;}
-
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
 <div id="login">
   <div class="login-box">
     <h3>Bienvenido</h3>
-    <input id="usuario" placeholder="Usuario">
-    <input id="password" type="password" placeholder="Contraseña">
+    <input id="usuario">
+    <input id="password" type="password">
     <button onclick="guardarUsuario()">Entrar</button>
     <p id="errorLogin"></p>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
 <div id="userInfo"></div>
@@ -272,27 +242,8 @@ h2 {
   <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
 </div>
 
-<div id="portada">
-  <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
-  <div class="titulo">CONTROL DE INVENTARIO</div>
-  <div class="sub">-----------------------------------------------------------------------------------</div>
-</div>
-
-<div id="menu" class="grid-menu">
-  <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
-  <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
-  <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
-  <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
-</div>
-
+<div id="menu" class="grid-menu"></div>
 <div id="productos"></div>
-
-<div id="panel">
-  <h2>Panel Admin</h2>
-  <button onclick="abrirFormulario()">➕ Agregar Producto</button>
-  <button onclick="verVentas()">📊 Ver Ventas</button>
-  <button onclick="inicio()">⬅ Volver</button>
-</div>
 
 </div>
 
@@ -300,297 +251,100 @@ h2 {
 
 <script>
 
-// NUEVO
 let carrito=[];
 let detalleActual=[];
 let ultimaVista="menu";
 
-// USUARIOS
-const usuariosSistema = {
-  luis:"123",
-  katy:"123",
-  katherine:"123",
-  richard:"123",
-  dante:"admin123"
-};
-const admins = ["dante"];
-
-// LOGIN
-function guardarUsuario(){
-  const user=usuario.value.toLowerCase();
-  const pass=password.value;
-
-  if(!usuariosSistema[user]) return errorLogin.innerText="Usuario no registrado";
-  if(usuariosSistema[user]!==pass) return errorLogin.innerText="Contraseña incorrecta";
-
-  localStorage.setItem("usuario",user);
-  location.reload();
-}
-
-function cerrarSesion(){
-  localStorage.removeItem("usuario");
-  location.reload();
-}
-
-// UI
-window.onload=()=>{
-  const user=localStorage.getItem("usuario");
-
-  login.style.display=user?"none":"flex";
-  app.style.display=user?"block":"none";
-
-  if(user){
-    userInfo.innerHTML=`USUARIO: ${user.toUpperCase()}`;
-    if(admins.includes(user)) panelBtn.style.display="inline-block";
-  }
-};
-
-// TOAST
 function mostrarToast(msg){
-  const t=document.getElementById("toast");
-  t.innerText=msg;
-  t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),2000);
+  toast.innerText=msg;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),2000);
 }
 
-// INVENTARIO
-const urlInv="https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
-let inventario=[];
-
-fetch(urlInv)
-.then(r=>r.json())
-.then(d=>{
-  inventario=d.map(p=>{
-    let o={};
-    Object.keys(p).forEach(k=>o[k.toLowerCase().trim()]=p[k]);
-
-    return {
-      id:o.id,
-      producto:o.producto,
-      categoria:(o.categoria||"").toUpperCase(),
-      talla:o.talla,
-      color:o.color,
-      stock:parseInt(o.stock)||0,
-      unidad:o["p.unidad"],
-      docena:o["p.docena"],
-      imagen:o.imagen
-    };
-  });
-});
-
-// MENU
-function abrir(cat){
-  ultimaVista = cat;
-  menu.style.display="none";
-  productos.style.display="grid";
-
-  const filtrados=inventario.filter(p=>p.categoria===cat && p.stock>0);
-
-  const unicos={};
-  filtrados.forEach(p=>{ if(!unicos[p.id]) unicos[p.id]=p; });
-
-  render(Object.values(unicos));
-
-  productos.innerHTML+=`<button onclick="inicio()">⬅ Volver</button>`;
-}
-
-function inicio(){
-  menu.style.display="grid";
-  productos.style.display="none";
-  panel.style.display="none";
-  ultimaVista="menu";
-}
-
-// LISTA
-function render(lista){
-  let html="";
-  lista.forEach(p=>{
-    html+=`
-    <div class="card" onclick="verProducto('${p.id}')">
-      <img src="${p.imagen}">
-      <h3>${p.producto}</h3>
-      <p style="color:lime;">S/ ${p.unidad}</p>
-    </div>`;
-  });
-  productos.innerHTML=html;
-}
-
-// DETALLE
-function verProducto(id){
-
-  const variantes=inventario.filter(p=>p.id==id);
-  const p=variantes[0];
-
-  const tallas=[...new Set(variantes.map(v=>v.talla))];
-  const stockTotal=variantes.reduce((a,b)=>a+b.stock,0);
-
-  productos.innerHTML=`
-    <div>
-      <img class="detalle-img" src="${p.imagen}">
-      <h2>${p.producto}</h2>
-
-      <div class="fila-opciones">
-
-        <div>
-          🧵 TALLAS
-          <select id="tallaSelect" onchange="cambiarTalla('${id}')">
-            ${tallas.map(t=>`<option value="${t}">${t}</option>`).join("")}
-            <option value="TODAS">TODAS</option>
-          </select>
-        </div>
-
-        <div>
-          📦 STOCK
-          <span class="stock" id="stockTalla">0</span>
-        </div>
-
-        <div>
-          📊 TOTAL
-          <span class="total">${stockTotal}</span>
-        </div>
-
-      </div>
-
-      <table id="tablaDetalle"></table>
-
-      <div class="fila-botones">
-        <button onclick="volverLista('${p.categoria}')">⬅ Volver</button>
-        <button style="background:#007bff;" onclick="agregarCarrito()">🛒 Agregar</button>
-      </div>
-    </div>
-  `;
-
-  cambiarTalla(id);
-}
-
-// FILTRO
-function cambiarTalla(id){
-  const talla=document.getElementById("tallaSelect").value;
-
-  let filtrados;
-
-  if(talla==="TODAS"){
-    filtrados=inventario.filter(p=>p.id==id);
-  } else {
-    filtrados=inventario.filter(p=>p.id==id && p.talla==talla);
-  }
-
-  detalleActual = filtrados;
-
-  const total=filtrados.reduce((a,b)=>a+b.stock,0);
-  document.getElementById("stockTalla").innerText=total;
-
-  let filas=`
-    <tr>
-      <th></th>
-      <th>TALLA</th>
-      <th>COLOR</th>
-      <th>STOCK</th>
-      <th>TIPO</th>
-      <th>P.UNIDAD</th>
-      <th>P.DOCENA</th>
-    </tr>
-  `;
-
-  filtrados.forEach((v,i)=>{
-    filas+=`
-      <tr>
-        <td><input type="radio" name="prodSelect" value="${i}"></td>
-        <td>${v.talla}</td>
-        <td>${v.color}</td>
-        <td>${v.stock}</td>
-        <td>
-          <select id="tipo${i}">
-            <option value="unidad">Unidad</option>
-            <option value="docena">Docena</option>
-          </select>
-        </td>
-        <td>S/ ${v.unidad}</td>
-        <td>S/ ${v.docena}</td>
-      </tr>
-    `;
-  });
-
-  document.getElementById("tablaDetalle").innerHTML=filas;
-}
-
-// AGREGAR
 function agregarCarrito(){
-
   const radios=document.getElementsByName("prodSelect");
   let index=-1;
-
-  radios.forEach((r,i)=>{
-    if(r.checked) index=i;
-  });
+  radios.forEach((r,i)=>{if(r.checked) index=i;});
 
   if(index===-1){
     mostrarToast("Selecciona producto");
     return;
   }
 
-  const item = detalleActual[index];
-  const tipo = document.getElementById("tipo"+index).value;
-
-  const precio = tipo==="docena" ? item.docena : item.unidad;
-
-  carrito.push({
-    ...item,
-    cantidad:1,
-    tipo,
-    precio
-  });
+  const item=detalleActual[index];
+  carrito.push({...item,cantidad:1});
 
   mostrarToast(item.producto+" agregado");
 }
 
-// CARRITO
 function verCarrito(){
 
+  let html="<h2 style='text-align:center;'>🛒 Carrito</h2>";
+
   if(carrito.length===0){
-    mostrarToast("Carrito vacío");
+    html+="<p style='text-align:center;'>Carrito vacío</p>";
+    html+=`<div class="fila-botones">
+      <button onclick="volverAtras()">⬅ Volver</button>
+    </div>`;
+    productos.innerHTML=html;
     return;
   }
 
   let total=0;
-  let html="<h2 style='text-align:center;'>🛒 Carrito</h2><table>";
+
+  html+=`
+  <table>
+  <tr>
+  <th>Producto</th>
+  <th>Talla</th>
+  <th>Color</th>
+  <th>Cant</th>
+  <th>Precio</th>
+  <th></th>
+  </tr>`;
 
   carrito.forEach((c,i)=>{
 
-    let precioFinal=c.precio;
-
-    if(c.cantidad>=12 && c.tipo==="unidad"){
-      precioFinal = c.docena/12;
+    let precio=c.unidad;
+    if(c.cantidad>=12){
+      precio=c.docena/12;
     }
 
-    const subtotal=precioFinal*c.cantidad;
+    const subtotal=precio*c.cantidad;
     total+=subtotal;
 
     html+=`
     <tr>
-      <td>${c.producto}<br>${c.talla}</td>
-      <td>
-        <button onclick="restar(${i})">-</button>
-        ${c.cantidad}
-        <button onclick="sumar(${i})">+</button>
-      </td>
-      <td>S/ ${subtotal.toFixed(2)}</td>
-      <td><button onclick="eliminarItem(${i})">❌</button></td>
+    <td>${c.producto}</td>
+    <td>${c.talla}</td>
+    <td>${c.color}</td>
+    <td>
+    <button onclick="restar(${i})">-</button>
+    ${c.cantidad}
+    <button onclick="sumar(${i})">+</button>
+    </td>
+    <td>S/ ${subtotal.toFixed(2)}</td>
+    <td><button onclick="eliminarItem(${i})">❌</button></td>
     </tr>`;
   });
 
   html+=`</table>
+  <p style="text-align:center;">P.UNIDAD → cambia a DOCENA desde 12</p>
+
+  <div style="text-align:center;">
+  Descuento: <input id="descuento" type="number" value="0" style="width:80px;">
+  </div>
+
   <h3 style="text-align:center;">TOTAL: S/ ${total.toFixed(2)}</h3>
 
   <div class="fila-botones">
-    <button onclick="volverAtras()">⬅ Volver</button>
-    <button style="background:#00c853;" onclick="comprar()">COMPRAR</button>
+  <button onclick="volverAtras()">⬅ Volver</button>
+  <button style="background:#00c853;" onclick="comprar()">COMPRAR</button>
   </div>`;
 
   productos.innerHTML=html;
 }
 
-// + -
 function sumar(i){
   carrito[i].cantidad++;
   verCarrito();
@@ -604,45 +358,34 @@ function restar(i){
   verCarrito();
 }
 
-// eliminar
 function eliminarItem(i){
   carrito.splice(i,1);
   verCarrito();
 }
 
-// volver
 function volverAtras(){
-  if(ultimaVista==="menu"){
-    inicio();
-  }else{
-    abrir(ultimaVista);
-  }
-}
-
-// comprar
-function comprar(){
-  mostrarToast("Compra realizada");
-  carrito=[];
   inicio();
 }
 
-// VOLVER
-function volverLista(cat){
-  abrir(cat);
-}
+function comprar(){
 
-// PANEL
-function abrirPanel(){
-  menu.style.display="none";
-  panel.style.display="block";
-}
+  let total=0;
+  const desc=parseFloat(document.getElementById("descuento").value)||0;
 
-function abrirFormulario(){
-  window.open("https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform");
-}
+  carrito.forEach(c=>{
+    let precio=c.unidad;
+    if(c.cantidad>=12){
+      precio=c.docena/12;
+    }
+    total+=precio*c.cantidad;
+  });
 
-function verVentas(){
-  window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE");
+  total-=desc;
+
+  mostrarToast("Venta S/ "+total.toFixed(2));
+
+  carrito=[];
+  inicio();
 }
 
 </script>
