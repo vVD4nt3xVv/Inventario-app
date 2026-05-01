@@ -1,708 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A&T KAMIARA</title>
-
-<style>
-body {
-  background:linear-gradient(135deg,#0b0b0b,#1a1a1a);
-  color:white;
-  font-family:Arial;
-  margin:0;
-  max-width:480px;
-  margin:auto;
-  font-size:15px;
-}
-
-/* LOGIN */
-#login {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-}
-
-.login-box {
-  background:#111;
-  padding:20px;
-  border-radius:20px;
-  width:90%;
-  max-width:320px;
-  text-align:center;
-}
-
-.login-box input, .login-box button {
-  width:100%;
-  padding:12px;
-  margin:6px 0;
-  border:none;
-  border-radius:10px;
-  font-size:14px;
-}
-
-.login-box input {background:#222;color:white;}
-.login-box button {background:red;color:white; font-weight:bold;}
-
-#errorLogin {color:#ff4d4d;}
-
-/* HEADER */
-#userInfo {
-  text-align:center;
-  margin-top:10px;
-  font-weight:bold;
-  font-size:16px;
-}
-
-/* BOTONES */
-.top-buttons {
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin:10px;
-}
-
-.btn-salir, .btn-admin {
-  padding:8px 18px;
-  border-radius:8px;
-  font-size:13px;
-  font-weight:bold;
-}
-
-.btn-salir {background:red;}
-.btn-admin {background:#007bff;display:none;}
-
-/* PORTADA */
-#portada img {width:100%;height:200px;object-fit:cover;}
-.titulo {text-align:center;font-size:24px;}
-.sub {text-align:center;color:gray;font-size:14px;}
-
-/* MENU */
-.grid-menu {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  padding:10px;
-}
-
-.menu-card {
-  background:#111;
-  border-radius:15px;
-  overflow:hidden;
-  text-align:center;
-  cursor:pointer;
-}
-
-.menu-card img {
-  width:100%;
-  height:120px;
-  object-fit:cover;
-}
-
-.menu-card p {
-  font-size:16px;
-  font-weight:bold;
-}
-
-/* PRODUCTOS */
-#productos {
-  display:none;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  padding:10px;
-}
-
-.card {
-  background:#111;
-  border-radius:15px;
-  padding:10px;
-  text-align:center;
-  cursor:pointer;
-}
-
-.card img {
-  width:100%;
-  height:140px;
-  object-fit:cover;
-  border-radius:10px;
-}
-
-.card h3 {font-size:16px; margin-bottom:5px;}
-.card p {font-size:14px; margin-top:5px;}
-
-/* DETALLE */
-.detalle-img {
-  width:100%;
-  border-radius:15px;
-}
-
-/* FILA */
-.fila-opciones {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#111;
-  padding:12px;
-  border-radius:10px;
-  margin-top:10px;
-  gap:10px;
-  text-align:center;
-  font-size:14px;
-}
-
-.fila-opciones div {
-  flex:1;
-}
-
-/* COLORES */
-.stock { color:#00ff88; font-weight:bold; margin-left:5px; font-size:15px; }
-.total { color:#00aaff; font-weight:bold; margin-left:5px; font-size:15px; }
-
-/* SELECT */
-select {
-  background:#222;
-  color:white;
-  border:none;
-  border-radius:8px;
-  padding:6px;
-  margin-left:5px;
-  font-size:14px;
-}
-
-/* TABLA */
-table {
-  width:100%;
-  margin-top:10px;
-  background:#111;
-  border-radius:10px;
-  text-align:center;
-  border-collapse: collapse;
-}
-
-th,td { padding:8px; font-size:14px; border-bottom: 1px solid #333;}
-
-/* BOTONES GLOBALES */
-button {
-  width:100%;
-  margin-top:10px;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:red;
-  color:white;
-  font-size:15px;
-  cursor:pointer;
-  font-weight:bold;
-}
-button:hover { opacity: 0.9; }
-
-h2 { text-align:center; }
-#panel {display:none;padding:20px;}
-
-/* -------------------------------------
-   DISEÑO CARRITO Y NOTIFICACIONES
----------------------------------------- */
-
-#toast-container {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  width: 90%;
-  max-width: 400px;
-}
-
-.toast {
-  padding: 15px;
-  border-radius: 10px;
-  color: white;
-  margin-bottom: 10px;
-  text-align: center;
-  font-weight: bold;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-  animation: slideDown 0.4s ease, fadeOut 0.4s 2s forwards;
-}
-
-.toast.success { background: #28a745; }
-.toast.error { background: #dc3545; }
-
-@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes fadeOut { to { opacity: 0; } }
-
-.btn-carrito-flotante {
-  background: #222;
-  border: 1px solid #444;
-  padding: 10px 15px;
-  border-radius: 20px;
-  color: white;
-  width: auto;
-  margin: 10px;
-  font-weight: bold;
-}
-
-#seccion-carrito { display: none; padding: 15px; }
-
-.carrito-header {
-  display: grid;
-  grid-template-columns: 2fr 1.2fr 1fr 1.2fr;
-  font-size: 11px;
-  color: #aaa;
-  padding: 10px;
-  border-bottom: 1px solid #333;
-  font-weight:bold;
-}
-
-.item-carrito {
-  display: grid;
-  grid-template-columns: 2fr 1.2fr 1fr 1.2fr;
-  align-items: center;
-  padding: 15px 10px;
-  background: #111;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  font-size: 13px;
-  border-left: 3px solid red;
-}
-
-/* CAJA DE DESCUENTO NUMÉRICO ALINEADA */
-.caja-descuento {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  background: #222;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #444;
-}
-
-.caja-descuento span {
-  font-size: 14px;
-  color: #aaa;
-  font-weight: bold;
-}
-
-.caja-descuento-inputs {
-  display: flex;
-}
-
-.caja-descuento-inputs input {
-  width: 70px;
-  background: transparent;
-  border: none;
-  border-right: 1px solid #444;
-  color: #00ff88;
-  padding: 8px 10px;
-  outline: none;
-  font-size: 15px;
-  font-weight: bold;
-  text-align: center;
-}
-
-.caja-descuento-inputs button {
-  width: auto;
-  margin: 0;
-  border-radius: 0 5px 5px 0;
-  background: transparent;
-  color: white;
-  padding: 8px 15px;
-}
-
-.cart-resumen {
-  background: #111;
-  padding: 20px;
-  border-radius: 15px;
-  margin-top: 15px;
-}
-
-.total-fila {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.total-final {
-  font-size: 18px;
-  font-weight: bold;
-  color: #00aaff;
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid #333;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A&T KAMIARA - Control de Inventario</title>
+    <!-- Enlace al archivo de estilos -->
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div id="toast-container"></div>
+    <div id="toast-container"></div>
 
-<!-- LOGIN -->
-<div id="login">
-  <div class="login-box">
-    <h3>Bienvenido</h3>
-    <input id="usuario" placeholder="Usuario">
-    <input id="password" type="password" placeholder="Contraseña">
-    <button onclick="guardarUsuario()">Entrar</button>
-    <p id="errorLogin"></p>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app" style="display:none;">
-
-  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-    <div id="userInfo" style="margin:0; text-align:left;"></div>
-    <button class="btn-carrito-flotante" onclick="mostrarCarrito()">
-      🛒 Carrito (<span id="cart-count">0</span>)
-    </button>
-  </div>
-
-  <div class="top-buttons">
-    <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-    <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
-  </div>
-
-  <div id="portada">
-    <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
-    <div class="titulo">CONTROL DE INVENTARIO</div>
-    <div class="sub">-----------------------------------------------------------------------------------</div>
-  </div>
-
-  <div id="menu" class="grid-menu">
-    <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
-    <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
-    <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
-    <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
-  </div>
-
-  <div id="productos"></div>
-
-  <!-- SECCIÓN CARRITO -->
-  <div id="seccion-carrito">
-    <h2>Tu Carrito</h2>
-    <div class="carrito-header">
-      <span>PRODUCTO</span>
-      <span style="text-align:center;">CANT.</span>
-      <span style="text-align:center;">UNIT.</span>
-      <span style="text-align:right;">TOTAL</span>
+    <!-- LOGIN -->
+    <div id="login">
+        <div class="login-box">
+            <h3>Bienvenido</h3>
+            <input id="usuario" placeholder="Usuario">
+            <input id="password" type="password" placeholder="Contraseña">
+            <button onclick="guardarUsuario()">Entrar</button>
+            <p id="errorLogin"></p>
+        </div>
     </div>
-    
-    <div id="lista-carrito"></div>
-    
-    <div class="cart-resumen">
-      
-      <!-- Subtotal -->
-      <div class="total-fila" style="color:#aaa; font-size:15px;">
-        <span>Subtotal (Precio Base):</span>
-        <span id="subtotalCarrito">S/ 0.00</span>
-      </div>
 
-      <!-- Input de Descuento (En Números) -->
-      <div class="caja-descuento">
-        <span>Descuento (S/):</span>
-        <div class="caja-descuento-inputs">
-          <input type="number" id="inputDescuento" placeholder="0.00" min="0" step="0.50">
-          <button onclick="aplicarDescuento()">Aplicar</button>
+    <!-- APP PRINCIPAL -->
+    <div id="app" style="display:none;">
+        <div class="header-app">
+            <div id="userInfo"></div>
+            <button class="btn-carrito-flotante" onclick="mostrarCarrito()">
+                🛒 Carrito (<span id="cart-count">0</span>)
+            </button>
         </div>
-      </div>
 
-      <!-- Total a Pagar -->
-      <div class="total-fila total-final">
-        <span>TOTAL A PAGAR:</span>
-        <span id="totalFinalCarrito">S/ 0.00</span>
-      </div>
+        <div class="top-buttons">
+            <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+            <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
+        </div>
 
-      <button style="background:#28a745; margin-top:25px;" onclick="alert('Pedido confirmado')">Confirmar Pedido</button>
-      <button style="background:#333;" onclick="inicio()">⬅ Seguir Comprando</button>
+        <div id="portada">
+            <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG" alt="Portada">
+            <div class="titulo">CONTROL DE INVENTARIO</div>
+            <div class="sub">---------------------------------------------------------</div>
+        </div>
+
+        <!-- Menú de Categorías -->
+        <div id="menu" class="grid-menu">
+            <div class="menu-card" onclick="abrir('INVIERNO')">
+                <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK">
+                <p>INVIERNO</p>
+            </div>
+            <div class="menu-card" onclick="abrir('VERANO')">
+                <img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx">
+                <p>VERANO</p>
+            </div>
+            <div class="menu-card" onclick="abrir('TECNOLOGIA')">
+                <img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq">
+                <p>TECNOLOGIA</p>
+            </div>
+            <div class="menu-card" onclick="abrir('NAVIDEÑO')">
+                <img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p">
+                <p>NAVIDEÑO</p>
+            </div>
+        </div>
+
+        <div id="productos"></div>
+
+        <!-- SECCIÓN CARRITO ESTILO FALABELLA -->
+        <div id="seccion-carrito">
+            <h2>Tu Carrito</h2>
+            <div class="carrito-header">
+                <span>PRODUCTO</span>
+                <span class="txt-center">CANT.</span>
+                <span class="txt-center">UNIT.</span>
+                <span class="txt-right">TOTAL</span>
+            </div>
+            
+            <div id="lista-carrito"></div>
+            
+            <div class="cart-resumen">
+                <div class="total-fila txt-grey">
+                    <span>Subtotal:</span>
+                    <span id="subtotalCarrito">S/ 0.00</span>
+                </div>
+
+                <!-- Caja de Descuento Alineada -->
+                <div class="caja-descuento">
+                    <span>Descuento (S/):</span>
+                    <div class="caja-descuento-inputs">
+                        <input type="number" id="inputDescuento" placeholder="0.00" min="0" step="0.50">
+                        <button onclick="aplicarDescuento()">Aplicar</button>
+                    </div>
+                </div>
+
+                <div class="total-fila total-final">
+                    <span>TOTAL A PAGAR:</span>
+                    <span id="totalFinalCarrito">S/ 0.00</span>
+                </div>
+
+                <button class="btn-confirmar" onclick="alert('Pedido confirmado')">Confirmar Pedido</button>
+                <button class="btn-volver" onclick="inicio()">⬅ Seguir Comprando</button>
+            </div>
+        </div>
+
+        <div id="panel">
+            <h2>Panel Admin</h2>
+            <button onclick="abrirFormulario()">➕ Agregar Producto</button>
+            <button onclick="verVentas()">📊 Ver Ventas</button>
+            <button onclick="inicio()">⬅ Volver</button>
+        </div>
     </div>
-  </div>
 
-  <div id="panel">
-    <h2>Panel Admin</h2>
-    <button onclick="abrirFormulario()">➕ Agregar Producto</button>
-    <button onclick="verVentas()">📊 Ver Ventas</button>
-    <button onclick="inicio()">⬅ Volver</button>
-  </div>
-
-</div>
-
-<script>
-// USUARIOS
-const usuariosSistema = {
-  luis:"123", katy:"123", katherine:"123", richard:"123", dante:"admin123"
-};
-const admins = ["dante"];
-
-// VARIABLES
-let carrito = [];
-let valorDescuento = 0;
-
-// LOGIN
-function guardarUsuario(){
-  const user=usuario.value.toLowerCase();
-  const pass=password.value;
-  if(!usuariosSistema[user]) return errorLogin.innerText="Usuario no registrado";
-  if(usuariosSistema[user]!==pass) return errorLogin.innerText="Contraseña incorrecta";
-  localStorage.setItem("usuario",user);
-  location.reload();
-}
-
-function cerrarSesion(){
-  localStorage.removeItem("usuario");
-  location.reload();
-}
-
-// UI
-window.onload=()=>{
-  const user=localStorage.getItem("usuario");
-  login.style.display=user?"none":"flex";
-  app.style.display=user?"block":"none";
-  if(user){
-    document.getElementById("userInfo").innerHTML=`👤 ${user.toUpperCase()}`;
-    if(admins.includes(user)) panelBtn.style.display="inline-block";
-  }
-};
-
-// INVENTARIO
-const urlInv="https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
-let inventario=[];
-
-fetch(urlInv)
-.then(r=>r.json())
-.then(d=>{
-  inventario=d.map(p=>{
-    let o={};
-    Object.keys(p).forEach(k=>o[k.toLowerCase().trim()]=p[k]);
-    return {
-      id:o.id, producto:o.producto, categoria:(o.categoria||"").toUpperCase(),
-      talla:o.talla, color:o.color, stock:parseInt(o.stock)||0,
-      unidad:parseFloat(o["p.unidad"])||0, docena:parseFloat(o["p.docena"])||0, imagen:o.imagen
-    };
-  });
-});
-
-// MENU
-function abrir(cat){
-  menu.style.display="none";
-  productos.style.display="grid";
-  document.getElementById("seccion-carrito").style.display="none";
-  portada.style.display="none";
-
-  const filtrados=inventario.filter(p=>p.categoria===cat && p.stock>0);
-  const unicos={};
-  filtrados.forEach(p=>{ if(!unicos[p.id]) unicos[p.id]=p; });
-
-  render(Object.values(unicos));
-  productos.innerHTML+=`<button style="background:#333; grid-column: span 2;" onclick="inicio()">⬅ Volver al Menú</button>`;
-}
-
-function inicio(){
-  menu.style.display="grid";
-  portada.style.display="block";
-  productos.style.display="none";
-  panel.style.display="none";
-  document.getElementById("seccion-carrito").style.display="none";
-}
-
-// LISTA
-function render(lista){
-  let html="";
-  lista.forEach(p=>{
-    html+=`
-    <div class="card" onclick="verProducto('${p.id}')">
-      <img src="${p.imagen}">
-      <h3>${p.producto}</h3>
-      <p style="color:lime; font-weight:bold;">S/ ${p.unidad}</p>
-    </div>`;
-  });
-  productos.innerHTML=html;
-}
-
-// DETALLE
-function verProducto(id){
-  const variantes=inventario.filter(p=>p.id==id);
-  const p=variantes[0];
-  const tallas=[...new Set(variantes.map(v=>v.talla))];
-  const stockTotal=variantes.reduce((a,b)=>a+b.stock,0);
-
-  productos.innerHTML=`
-    <div style="grid-column: span 2;">
-      <img class="detalle-img" src="${p.imagen}">
-      <h2>${p.producto}</h2>
-
-      <div class="fila-opciones">
-        <div>
-          🧵 TALLAS
-          <select id="tallaSelect" onchange="cambiarTalla('${id}')">
-            ${tallas.map(t=>`<option value="${t}">${t}</option>`).join("")}
-            <option value="TODAS">TODAS</option>
-          </select>
-        </div>
-        <div>📦 STOCK <span class="stock" id="stockTalla">0</span></div>
-        <div>📊 TOTAL <span class="total">${stockTotal}</span></div>
-      </div>
-
-      <table id="tablaDetalle"></table>
-      
-      <button onclick="prepararCaptura('${id}')" style="background:#28a745; margin-top:20px;">🛒 Añadir al Carrito</button>
-      <button onclick="volverLista('${p.categoria}')" style="background:#333;">⬅ Volver</button>
-    </div>
-  `;
-  cambiarTalla(id);
-}
-
-// FILTRO
-function cambiarTalla(id){
-  const talla=document.getElementById("tallaSelect").value;
-  let filtrados = talla==="TODAS" ? inventario.filter(p=>p.id==id) : inventario.filter(p=>p.id==id && p.talla==talla);
-
-  const total=filtrados.reduce((a,b)=>a+b.stock,0);
-  document.getElementById("stockTalla").innerText=total;
-
-  let filas=`<tr><th>TALLA</th><th>COLOR</th><th>STOCK</th><th>UNIDAD</th><th>DOCENA</th></tr>`;
-  filtrados.forEach(v=>{
-    filas+=`<tr><td>${v.talla}</td><td>${v.color}</td><td>${v.stock}</td><td>S/${v.unidad}</td><td>S/${v.docena}</td></tr>`;
-  });
-  document.getElementById("tablaDetalle").innerHTML=filas;
-}
-
-function volverLista(cat){ abrir(cat); }
-
-// PANEL
-function abrirPanel(){ menu.style.display="none"; panel.style.display="block"; }
-function abrirFormulario(){ window.open("https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform"); }
-function verVentas(){ window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE"); }
-
-// -----------------------------------------------------
-// LÓGICA DEL CARRITO Y DESCUENTOS
-// -----------------------------------------------------
-
-function showToast(msj, tipo) {
-  const container = document.getElementById("toast-container");
-  const toast = document.createElement("div");
-  toast.className = `toast ${tipo}`;
-  toast.innerText = msj;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 2500);
-}
-
-function prepararCaptura(id) {
-  const t = document.getElementById("tallaSelect").value;
-  const item = inventario.find(p => p.id == id && (t === "TODAS" ? true : p.talla === t) && p.stock > 0);
-  if(item) {
-    agregarAlCarrito(id, item.talla, item.color);
-  } else {
-    showToast("❌ Seleccione una talla válida con stock", "error");
-  }
-}
-
-function agregarAlCarrito(id, talla, color) {
-  const itemOriginal = inventario.find(p => p.id == id && p.talla == talla && p.color == color);
-  if (!itemOriginal || itemOriginal.stock <= 0) return showToast("❌ Sin stock", "error");
-
-  const existente = carrito.find(p => p.id == id && p.talla == talla && p.color == color);
-
-  if (existente) {
-    if(existente.cantidad >= itemOriginal.stock) return showToast("❌ Límite de stock", "error");
-    existente.cantidad++;
-  } else {
-    carrito.push({ ...itemOriginal, cantidad: 1 });
-  }
-
-  showToast("✅ Producto añadido", "success");
-  actualizarContador();
-}
-
-function actualizarContador() {
-  document.getElementById("cart-count").innerText = carrito.reduce((a, b) => a + b.cantidad, 0);
-}
-
-function mostrarCarrito() {
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("productos").style.display = "none";
-  document.getElementById("portada").style.display = "none";
-  document.getElementById("seccion-carrito").style.display = "block";
-  renderizarCarrito();
-}
-
-function cambiarCant(index, valor) {
-  const item = carrito[index];
-  const itemOriginal = inventario.find(p => p.id == item.id && p.talla == item.talla && p.color == item.color);
-  
-  if (valor > 0 && item.cantidad >= itemOriginal.stock) {
-    return showToast("❌ Límite de stock", "error");
-  }
-
-  item.cantidad += valor;
-  
-  if (item.cantidad <= 0) {
-    carrito.splice(index, 1);
-    showToast("❌ Producto eliminado", "error");
-  }
-  renderizarCarrito();
-  actualizarContador();
-}
-
-function aplicarDescuento() {
-  const inputVal = parseFloat(document.getElementById("inputDescuento").value);
-  
-  if (!isNaN(inputVal) && inputVal >= 0) {
-    valorDescuento = inputVal;
-    showToast(`✅ Descuento de S/ ${valorDescuento.toFixed(2)} aplicado`, "success");
-  } else {
-    valorDescuento = 0;
-    document.getElementById("inputDescuento").value = "";
-    showToast("❌ Ingrese un valor válido", "error");
-  }
-  renderizarCarrito(); // Recalcula los totales
-}
-
-function renderizarCarrito() {
-  const lista = document.getElementById("lista-carrito");
-  let html = "";
-  let sumaSubtotal = 0;
-
-  // Evaluar cantidad por ID para aplicar precio docena
-  const conteoPorID = {};
-  carrito.forEach(p => { conteoPorID[p.id] = (conteoPorID[p.id] || 0) + p.cantidad; });
-
-  carrito.forEach((p, index) => {
-    const usaPrecioDocena = conteoPorID[p.id] >= 12;
-    const precioAplicado = usaPrecioDocena ? parseFloat(p.docena) : parseFloat(p.unidad);
-    const subtotalFila = precioAplicado * p.cantidad;
-    sumaSubtotal += subtotalFila;
-
-    html += `
-      <div class="item-carrito">
-        <div>
-          <b>${p.producto}</b><br>
-          <small>${p.talla} / ${p.color}</small>
-        </div>
-        <div style="text-align:center;">
-          <button style="width:25px; padding:2px; margin:0; font-size:16px;" onclick="cambiarCant(${index},-1)">-</button>
-          <span style="margin: 0 5px;">${p.cantidad}</span>
-          <button style="width:25px; padding:2px; margin:0; font-size:16px;" onclick="cambiarCant(${index},1)">+</button>
-        </div>
-        <div style="text-align:center;">S/ ${precioAplicado.toFixed(2)}</div>
-        <div style="text-align:right; font-weight:bold;">S/ ${subtotalFila.toFixed(2)}</div>
-      </div>
-    `;
-  });
-
-  lista.innerHTML = html || "<p style='text-align:center; padding:20px; color:#aaa;'>Tu carrito está vacío</p>";
-  
-  // Calcular Total Final
-  document.getElementById("subtotalCarrito").innerText = `S/ ${sumaSubtotal.toFixed(2)}`;
-  
-  let totalFinal = sumaSubtotal - valorDescuento;
-  if (totalFinal < 0) totalFinal = 0; // Evitar totales negativos
-  
-  document.getElementById("totalFinalCarrito").innerText = `S/ ${totalFinal.toFixed(2)}`;
-}
-</script>
-
+    <!-- Enlace al archivo de lógica -->
+    <script src="script.js"></script>
 </body>
 </html>
