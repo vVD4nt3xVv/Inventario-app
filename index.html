@@ -3,73 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A&T KAMIARA - Inventario</title>
+    <title>A&T KAMIARA</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div id="toast-container"></div>
 
-    <!-- LOGIN -->
-    <div id="login">
-        <div class="login-box">
-            <h2>A&T KAMIARA</h2>
-            <input id="usuario" placeholder="Usuario">
-            <input id="password" type="password" placeholder="Contraseña">
-            <button onclick="guardarUsuario()">ENTRAR</button>
-            <p id="errorLogin"></p>
-        </div>
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <h3>Bienvenido</h3>
+    <input id="usuario" placeholder="Usuario">
+    <input id="password" type="password" placeholder="Contraseña">
+    <button onclick="guardarUsuario()">Entrar</button>
+    <p id="errorLogin"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+
+    <div id="userInfo"></div>
+
+    <div class="top-buttons">
+      <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+      <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
     </div>
 
-    <!-- APP -->
-    <div id="app" style="display:none;">
-        <div class="header-app">
-            <div id="userInfo"></div>
-            <button onclick="mostrarCarrito()">🛒 Carrito (<span id="cart-count">0</span>)</button>
-        </div>
-
-        <div id="portada">
-            <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG" alt="Portada">
-        </div>
-
-        <!-- Menú de Categorías -->
-        <div id="menu" class="grid-menu">
-            <div class="menu-card" onclick="abrir('INVIERNO')">
-                <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK">
-                <p>INVIERNO</p>
-            </div>
-            <!-- ... demás categorías ... -->
-        </div>
-
-        <div id="productos"></div>
-
-        <!-- SECCIÓN CARRITO -->
-        <div id="seccion-carrito" style="display:none;">
-            <h2>Tu Pedido</h2>
-            <div id="lista-carrito"></div>
-            
-            <div class="cart-resumen">
-                <div class="total-fila">
-                    <span>Subtotal:</span>
-                    <span id="subtotalCarrito">S/ 0.00</span>
-                </div>
-
-                <div class="caja-descuento">
-                    <span>Descuento (S/):</span>
-                    <div class="grupo-input">
-                        <input type="number" id="inputDescuento" placeholder="0.00">
-                        <button onclick="aplicarDescuento()">APLICAR</button>
-                    </div>
-                </div>
-
-                <div class="total-fila total-final">
-                    <span>TOTAL:</span>
-                    <span id="totalFinalCarrito">S/ 0.00</span>
-                </div>
-                <button class="btn-confirmar" onclick="confirmarPedido()">CONFIRMAR</button>
-            </div>
-        </div>
+    <div id="portada">
+      <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
+      <div class="titulo">CONTROL DE INVENTARIO</div>
+      <div class="sub">-----------------------------------------------------------------------------------</div>
     </div>
 
-    <script src="app.js"></script>
+    <div id="menu" class="grid-menu">
+      <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
+      <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
+      <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
+      <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
+    </div>
+
+    <div id="productos"></div>
+
+    <div id="panel">
+      <h2>Panel Admin</h2>
+      <button onclick="abrirFormulario()">➕ Agregar Producto</button>
+      <button onclick="verVentas()">📊 Ver Ventas</button>
+      <button onclick="inicio()">⬅ Volver</button>
+    </div>
+
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
