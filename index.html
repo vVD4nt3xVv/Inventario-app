@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A&T KAMIARA</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Librerías para PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -16,7 +15,7 @@
 <!-- LOGIN -->
 <div id="login">
   <div class="login-box">
-    <h3>Bienvenido</h3>
+    <h3>BIENVENIDO</h3>
     <input id="usuario" placeholder="Usuario">
     <input id="password" type="password" placeholder="Contraseña">
     <button onclick="guardarUsuario()">Entrar</button>
@@ -28,14 +27,13 @@
 <div id="app" style="display:none;">
     <div id="userInfo"></div>
 
-    <!-- HEADER CON ESPACIO PARA 3 BOTONES -->
     <div class="top-buttons">
       <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-      <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
+      <!-- El panel ahora se abre en pestaña nueva -->
+      <button class="btn-admin" id="panelBtn" onclick="abrirPanelNuevaPestaña()" style="display:none;">Panel</button>
       <button class="btn-carrito-top" onclick="verCarrito()">🛒 Carrito (<span id="cart-count">0</span>)</button>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <div id="main-content">
         <div id="portada">
           <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
@@ -51,22 +49,13 @@
         <div id="productos"></div>
     </div>
 
-    <!-- VISTA DEL CARRITO -->
     <div id="carrito-view" style="display:none; padding:15px;">
-        <h2 style="text-align:left;">🛒 Mi Carrito</h2>
+        <h2>🛒 Mi Carrito</h2>
         <div id="lista-carrito"></div>
         <div id="resumen-pago"></div>
     </div>
 
-    <!-- VISTA DEL VOUCHER -->
     <div id="voucher-view" style="display:none; padding:15px;"></div>
-
-    <div id="panel">
-      <h2>Panel Admin</h2>
-      <button onclick="abrirFormulario()">➕ Agregar Producto</button>
-      <button onclick="verVentas()">📊 Ver Ventas</button>
-      <button onclick="inicio()">⬅ Volver</button>
-    </div>
 </div>
 
 <script src="app.js"></script>
