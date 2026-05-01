@@ -3,69 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA A&T KAMIARA</title>
+    <title>A&T KAMIARA - Sistema Oficial</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Librerías para PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-<div id="toast">¡Añadido al carrito!</div>
+<div id="toast">¡Añadido con éxito!</div>
 
 <!-- LOGIN -->
-<div id="login">
+<div id="login-screen">
   <div class="login-box">
-    <h2>BIENVENIDO</h2>
-    <p>A&T KAMIARA S.A.C.</p>
+    <h2 style="color:#5cb85c; letter-spacing:2px;">A&T KAMIARA</h2>
+    <p style="font-size:11px; color:#666;">CONTROL DE INVENTARIO V.2026</p>
     <input id="u" placeholder="Usuario">
     <input id="p" type="password" placeholder="Contraseña">
-    <button onclick="login()">INGRESAR</button>
-    <p id="err" style="color:red; font-size:12px; margin-top:10px;"></p>
+    <button onclick="login()">INGRESAR AL SISTEMA</button>
+    <p id="err" style="color:#d9534f; font-size:12px; margin-top:10px;"></p>
   </div>
 </div>
 
-<!-- APLICACIÓN -->
+<!-- APLICACIÓN PRINCIPAL -->
 <div id="app" style="display:none;">
-    <div id="v-inicio">
-        <div id="portada">
-            <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
+    <!-- BARRA SUPERIOR FIJA (3 COLUMNAS) -->
+    <header class="top-nav">
+        <div class="nav-col-izq">
+            <span id="user-display"></span><br>
+            <button class="btn-sm-red" onclick="salir()">Salir</button>
         </div>
-        <div class="titulo-app">A&T KAMIARA</div>
-        <div class="header-actions">
-            <button onclick="verCarrito()">🛒 Carrito (<span id="count">0</span>)</button>
-            <button id="adminBtn" onclick="abrirAdmin()" style="display:none;">⚙️ Admin</button>
+        <div class="nav-col-cen">
+            <button id="adminBtn" class="btn-sm-blue" style="display:none;" onclick="abrirAdmin()">PANEL ADMIN</button>
         </div>
-        <div class="grid-menu" id="menu-cats"></div>
-    </div>
-
-    <div id="v-productos" style="display:none;">
-        <div class="titulo-app" id="cat-nombre">PRODUCTOS</div>
-        <div class="scroll-container" id="lista-prods"></div>
-    </div>
-
-    <div id="v-detalle" style="display:none; padding:15px;">
-        <div id="detalle-content"></div>
-    </div>
-
-    <div id="v-carrito" style="display:none; padding:15px;">
-        <h2 class="titulo-app">MI CARRITO</h2>
-        <div id="cart-list"></div>
-        <div id="cart-total" class="total-box"></div>
-    </div>
-
-    <div id="v-voucher" style="display:none; padding:15px;">
-        <div id="voucher-legal"></div>
-        <div class="ws-box">
-            <input type="tel" id="ws-phone" placeholder="Número de WhatsApp (ej: 987654321)">
+        <div class="nav-col-der">
+            <button class="btn-sm-green" onclick="verCarrito()">🛒 Carrito (<span id="count">0</span>)</button>
         </div>
-    </div>
+    </header>
 
-    <!-- NAVEGACIÓN (3 COLUMNAS) -->
-    <div class="footer-nav" id="controles" style="display:none;">
-        <button class="btn-nav-izq" id="btn-back">Volver</button>
-        <div></div> <!-- Espacio central vacío -->
+    <main id="content-area">
+        <!-- VISTA INICIO -->
+        <section id="v-inicio">
+            <div id="portada">
+                <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
+            </div>
+            <div class="grid-menu" id="menu-cats"></div>
+        </section>
+
+        <!-- VISTA PRODUCTOS (SCROLLABLE) -->
+        <section id="v-productos" style="display:none;">
+            <h2 class="section-title" id="cat-nombre">CATEGORÍA</h2>
+            <div class="scroll-container" id="lista-prods"></div>
+        </section>
+
+        <!-- VISTA DETALLE -->
+        <section id="v-detalle" style="display:none; padding:15px;">
+            <div id="detalle-header" class="stock-info-bar">
+                <div id="stock-total-div">ST. TOTAL: 0</div>
+                <div id="stock-talla-div">ST. TALLA: 0</div>
+                <div></div>
+            </div>
+            <div id="detalle-content"></div>
+        </section>
+
+        <!-- VISTA CARRITO -->
+        <section id="v-carrito" style="display:none; padding:15px;">
+            <h2 class="section-title">DETALLE DE COMPRA</h2>
+            <div id="cart-list"></div>
+            <div id="cart-total" class="total-display"></div>
+        </section>
+
+        <!-- VISTA VOUCHER -->
+        <section id="v-voucher" style="display:none; padding:15px;">
+            <div id="voucher-legal"></div>
+            <div class="ws-input-container">
+                <input type="tel" id="ws-phone" placeholder="WhatsApp del Cliente">
+            </div>
+        </section>
+    </main>
+
+    <!-- NAVEGACIÓN INFERIOR FIJA (3 COLUMNAS) -->
+    <footer class="footer-nav" id="controles" style="display:none;">
+        <button class="btn-nav-izq" id="btn-back">← Volver</button>
+        <div></div> <!-- Espacio central libre -->
         <button class="btn-nav-der" id="btn-next">Acción</button>
-    </div>
+    </footer>
 </div>
 
 <script src="app.js"></script>
