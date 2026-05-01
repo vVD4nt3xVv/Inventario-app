@@ -3,69 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A&T KAMIARA</title>
+    <title>A&T KAMIARA | Pro Store</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Iconos para un look más pro -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-<!-- LOGIN -->
+<div id="toast-container"></div>
+
 <div id="login">
   <div class="login-box">
-    <h3>Bienvenido</h3>
-    <input id="usuario" placeholder="Usuario">
-    <input id="password" type="password" placeholder="Contraseña">
-    <button onclick="guardarUsuario()">Entrar</button>
+    <div class="logo-tienda">A&T</div>
+    <h3>PANEL DE ACCESO</h3>
+    <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input id="usuario" placeholder="Usuario">
+    </div>
+    <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input id="password" type="password" placeholder="Contraseña">
+    </div>
+    <button class="btn-login" onclick="guardarUsuario()">ENTRAR</button>
     <p id="errorLogin"></p>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
-    <div id="userInfo"></div>
+    <header class="header-pro">
+        <div id="userInfo"></div>
+        <div class="header-actions">
+            <button class="btn-icon btn-salir" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i></button>
+            <button id="btnVerCarrito" class="btn-nav btn-carrito-top" onclick="mostrarCarrito()">
+                <i class="fas fa-shopping-cart"></i> <span id="cart-count">0</span>
+            </button>
+            <button class="btn-icon btn-admin" id="panelBtn" onclick="abrirPanel()"><i class="fas fa-cog"></i></button>
+        </div>
+    </header>
 
-    <div class="top-buttons">
-      <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-      <button id="btnVerCarrito" class="btn-carrito" onclick="mostrarCarrito()">🛒 Carrito (0)</button>
-      <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
-    </div>
-
-    <div id="portada">
+    <div id="portada" class="hero-section">
       <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
-      <div class="titulo">CONTROL DE INVENTARIO</div>
-      <div class="sub">-----------------------------------------------------------------------------------</div>
+      <div class="hero-overlay">
+          <div class="titulo">LUMOX S.A.C.</div>
+          <div class="sub">Gestión de Inventario Premium</div>
+      </div>
     </div>
 
-    <!-- Menú Principal -->
     <div id="menu" class="grid-menu">
-      <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
-      <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
-      <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
-      <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
+      <div class="menu-card" onclick="abrir('INVIERNO')">
+          <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK">
+          <div class="card-label">INVIERNO</div>
+      </div>
+      <div class="menu-card" onclick="abrir('VERANO')">
+          <img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx">
+          <div class="card-label">VERANO</div>
+      </div>
+      <div class="menu-card" onclick="abrir('TECNOLOGIA')">
+          <img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq">
+          <div class="card-label">TECNOLOGÍA</div>
+      </div>
+      <div class="menu-card" onclick="abrir('NAVIDEÑO')">
+          <img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p">
+          <div class="card-label">NAVIDEÑO</div>
+      </div>
     </div>
 
-    <!-- Contenedor dinámico de productos -->
     <div id="productos"></div>
 
-    <!-- Vista del Carrito -->
     <div id="seccion-carrito" style="display:none; padding:15px;">
-        <h2>Mi Carrito</h2>
-        <div id="lista-carrito"></div>
-        <div class="resumen-total">
-            <h3 style="margin:0; display:flex; justify-content:space-between;">
-                <span>TOTAL A PAGAR:</span>
-                <span id="totalCarrito">S/ 0.00</span>
-            </h3>
+        <h2 class="section-title">Resumen de Compra</h2>
+        
+        <!-- Cabecera de columnas para orden -->
+        <div class="carrito-header">
+            <span>PRODUCTO</span>
+            <span>CANT</span>
+            <span>P.UNI</span>
+            <span>SUBTOTAL</span>
         </div>
-        <button class="btn-pedido" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
-        <button class="btn-volver" onclick="inicio()">⬅ Volver al Menú</button>
+
+        <div id="lista-carrito"></div>
+
+        <div class="cart-footer">
+            <div class="total-row">
+                <span>TOTAL ESTIMADO:</span>
+                <span id="totalCarrito">S/ 0.00</span>
+            </div>
+            <button class="btn-pro btn-check" onclick="finalizarPedido()">CONFIRMAR PEDIDO</button>
+            <button class="btn-pro btn-back" onclick="inicio()">VOLVER AL CATÁLOGO</button>
+        </div>
     </div>
 
-    <!-- Panel Admin -->
     <div id="panel">
-      <h2>Panel Admin</h2>
-      <button onclick="abrirFormulario()">➕ Agregar Producto</button>
-      <button onclick="verVentas()">📊 Ver Ventas</button>
-      <button onclick="inicio()">⬅ Volver</button>
+      <h2>Panel Administración</h2>
+      <button class="btn-pro btn-admin-opt" onclick="abrirFormulario()">➕ Agregar Producto</button>
+      <button class="btn-pro btn-admin-opt" onclick="verVentas()">📊 Reporte de Ventas</button>
+      <button class="btn-pro btn-back" onclick="inicio()">⬅ Salir del Panel</button>
     </div>
 </div>
 
