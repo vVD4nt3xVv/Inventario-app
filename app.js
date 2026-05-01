@@ -201,3 +201,82 @@ function abrirFormulario(){
 function verVentas(){
   window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE");
 }
+let carrito = [];
+let descuentoGlobal = 0;
+
+// Función para agregar al carrito (llamar desde el botón de la tabla de detalles)
+function agregarAlCarrito(id, talla, color) {
+    const item = inventario.find(p => p.id == id && p.talla == talla && p.color == color);
+    
+    const existe = carrito.find(c => c.id == id && c.talla == talla && c.color == color);
+    if(existe) {
+        existe.cantidad++;
+    } else {
+        carrito.push({ ...item, cantidad: 1 });
+    }
+    
+    alert("Agregado al carrito");
+    verCarrito(); // Mostramos el carrito al agregar
+}
+
+function verCarrito() {
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("productos").style.display = "none";
+    document.getElementById("carrito").style.display = "block";
+    renderCarrito();
+}
+
+function renderCarrito() {
+    const lista = document.getElementById("lista-carrito");
+    let html = "";
+    let subtotalGeneral = 0;
+
+    carrito.forEach((item, index) => {
+        // LÓGICA DE PRECIO: Si es 12 o más, usamos precio docena
+        const precioUsar = item.cantidad >= 12 ? parseFloat(item.docena) : parseFloat(item.unidad);
+        const subtotalItem = precioUsar * item.cantidad;
+        subtotalGeneral += subtotalItem;
+
+        html += `
+        <div class="item-carrito">
+            <div class="info-principal">${item.producto} <button class="btn-eliminar" onclick="eliminarItem(${index})">X</button></div>
+            <div class="grid-carrito">
+                <span>T: ${item.talla}</span>
+                <span>C: ${item.color}</span>
+                <div class="controles-cant">
+                    <button class="btn-cant" onclick="cambiarCant(${index}, -1)">-</button>
+                    <span>${item.cantidad}</span>
+                    <button class="btn-cant" onclick="cambiarCant(${index}, 1)">+</button>
+                </div>
+                <span style="text-align:right">S/ ${subtotalItem.toFixed(2)}</span>
+            </div>
+            <small style="color:gray">${item.cantidad >= 12 ? '(Precio Docena aplicado)' : '(Precio Unidad)'}</small>
+        </div>`;
+    });
+
+    lista.innerHTML = html;
+    const totalFinal = subtotalGeneral - descuentoGlobal;
+    document.getElementById("precioTotalCarrito").innerText = `S/ ${totalFinal.toFixed(2)}`;
+}
+
+function cambiarCant(index, valor) {
+    carrito[index].cantidad += valor;
+    if(carrito[index].cantidad <= 0) return eliminarItem(index);
+    renderCarrito();
+}
+
+function eliminarItem(index) {
+    carrito.splice(index, 1);
+    renderCarrito();
+}
+
+function aplicarDescuento() {
+    descuentoGlobal = parseFloat(document.getElementById("montoDescuento").value) || 0;
+    renderCarrito();
+}
+
+// MODIFICACIÓN DE LA TABLA DE DETALLES:
+// Para que esto funcione, debes modificar tu función cambiarTalla en app.js 
+// para agregar un botón de "Añadir" en cada fila de la tabla:
+// Ejemplo dentro del filtrados.forEach de cambiarTalla:
+// <td><button onclick="agregarAlCarrito('${v.id}','${v.talla}','${v.color}')" style="margin:0; padding:5px; font-size:10px;">🛒</button></td>
