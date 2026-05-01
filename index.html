@@ -2,38 +2,198 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A&T KAMIARA</title>
 
 <style>
-body {background:#0b0b0b;color:white;font-family:Arial;margin:0;}
+body {
+  background:linear-gradient(135deg,#0b0b0b,#1a1a1a);
+  color:white;
+  font-family:Arial;
+  margin:0;
+  max-width:480px;
+  margin:auto;
+  font-size:15px;
+}
 
-#portada {text-align:center;}
+/* LOGIN */
+#login {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+
+.login-box {
+  background:#111;
+  padding:20px;
+  border-radius:20px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+}
+
+.login-box input, .login-box button {
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border:none;
+  border-radius:10px;
+  font-size:14px;
+}
+
+.login-box input {background:#222;color:white;}
+.login-box button {background:red;color:white;}
+
+#errorLogin {color:#ff4d4d;}
+
+/* HEADER */
+#userInfo {
+  text-align:center;
+  margin-top:10px;
+  font-weight:bold;
+  font-size:16px;
+}
+
+/* BOTONES */
+.top-buttons {
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:10px;
+}
+
+.btn-salir, .btn-admin {
+  padding:8px 18px;
+  border-radius:8px;
+  font-size:13px;
+}
+
+.btn-salir {background:red;}
+.btn-admin {background:#007bff;display:none;}
+
+/* PORTADA */
 #portada img {width:100%;height:200px;object-fit:cover;}
-.titulo {font-size:22px;margin-top:10px;}
-.sub {color:gray;}
+.titulo {text-align:center;font-size:24px;}
+.sub {text-align:center;color:gray;font-size:14px;}
 
-#login {text-align:center;padding:20px;}
-#userInfo {text-align:center;margin-top:10px;color:lime;}
+/* MENU */
+.grid-menu {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  padding:10px;
+}
 
-#menu {display:flex;flex-wrap:wrap;justify-content:center;}
 .menu-card {
-  width:40%;margin:10px;padding:10px;border-radius:15px;
-  background:#111;text-align:center;
+  background:#111;
+  border-radius:15px;
+  overflow:hidden;
+  text-align:center;
+  cursor:pointer;
+  transition:0.2s;
+}
+.menu-card:hover {transform:scale(1.03);}
+
+.menu-card img {
+  width:100%;
+  height:120px;
+  object-fit:cover;
 }
 
-#productos {display:none;flex-wrap:wrap;justify-content:center;}
+.menu-card p {
+  font-size:16px;
+}
+
+/* PRODUCTOS */
+#productos {
+  display:none;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  padding:10px;
+}
+
 .card {
-  width:45%;margin:10px;padding:10px;border-radius:15px;background:#111;
+  background:#111;
+  border-radius:15px;
+  padding:10px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.2s;
 }
-.card img {width:100%;border-radius:10px;}
+.card:hover {transform:scale(1.03);}
 
+.card img {
+  width:100%;
+  height:140px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.card h3 {font-size:16px;}
+.card p {font-size:14px;}
+
+/* DETALLE */
+.detalle-img {
+  width:100%;
+  border-radius:15px;
+}
+
+/* FILA */
+.fila-opciones {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#111;
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
+  gap:10px;
+  text-align:center;
+  font-size:14px;
+}
+
+.fila-opciones div {flex:1;}
+
+/* COLORES */
+.stock {color:#00ff88;font-weight:bold;}
+.total {color:#00aaff;font-weight:bold;}
+
+/* SELECT */
+select {
+  background:#222;
+  color:white;
+  border:none;
+  border-radius:8px;
+  padding:6px;
+}
+
+/* TABLA */
+table {
+  width:100%;
+  margin-top:10px;
+  background:#111;
+  border-radius:10px;
+  text-align:center;
+}
+
+th,td {padding:8px;font-size:14px;}
+
+/* BOTONES */
 button {
-  width:100%;margin-top:5px;padding:8px;border:none;
-  border-radius:10px;background:red;color:white;
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:red;
+  color:white;
+  font-size:15px;
 }
 
-#volver {display:none;padding:10px;background:#222;text-align:center;}
-#panel, #dashboard {display:none;padding:20px;}
+h2 {text-align:center;}
+
+#panel {display:none;padding:20px;}
 </style>
 </head>
 
@@ -41,286 +201,309 @@ button {
 
 <!-- LOGIN -->
 <div id="login">
-  <h3>Ingresar usuario</h3>
-  <input id="usuario" placeholder="Nombre">
-  <button onclick="guardarUsuario()">Entrar</button>
+  <div class="login-box">
+    <h3>Bienvenido</h3>
+    <input id="usuario" placeholder="Usuario">
+    <input id="password" type="password" placeholder="Contraseña">
+    <button onclick="guardarUsuario()">Entrar</button>
+    <p id="errorLogin"></p>
+  </div>
 </div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
 
 <div id="userInfo"></div>
 
-<!-- PANEL BTN -->
-<div id="panelBtn" style="display:none;">
-  <button onclick="abrirPanel()">⚙️ PANEL ADMIN</button>
+<div class="top-buttons">
+  <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+  <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
 </div>
 
-<!-- PORTADA -->
 <div id="portada">
-  <img src="https://via.placeholder.com/800x200">
-  <div class="titulo">A&T KAMIARA S.A.C.</div>
-  <div class="sub">Control de Inventario</div>
+  <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
+  <div class="titulo">CONTROL DE INVENTARIO</div>
+  <div class="sub">-----------------------------------------------------------------------------------</div>
 </div>
 
-<!-- MENU -->
-<div id="menu">
-  <div class="menu-card" onclick="abrir('INVIERNO')">❄️ INVIERNO</div>
-  <div class="menu-card" onclick="abrir('VERANO')">☀️ VERANO</div>
-  <div class="menu-card" onclick="abrir('TECNOLOGIA')">💻 TECNOLOGÍA</div>
-  <div class="menu-card" onclick="abrir('OTONO')">🍂 OTOÑO</div>
-  <div class="menu-card" onclick="abrir('NAVIDAD')">🎄 NAVIDAD</div>
-  <div class="menu-card" onclick="abrir('JUGUETES')">🧸 JUGUETES</div>
-  <div class="menu-card" onclick="abrir('OTROS')">📦 OTROS</div>
+<div id="menu" class="grid-menu">
+  <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
+  <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
+  <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
+  <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
 </div>
 
-<div id="volver" onclick="inicio()">⬅ Volver</div>
 <div id="productos"></div>
 
-<!-- PANEL -->
 <div id="panel">
   <h2>Panel Admin</h2>
   <button onclick="abrirFormulario()">➕ Agregar Producto</button>
   <button onclick="verVentas()">📊 Ver Ventas</button>
-  <button onclick="abrirDashboard()">📊 Dashboard</button>
   <button onclick="inicio()">⬅ Volver</button>
 </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard">
-  <h2>📊 Dashboard</h2>
-
-  <p id="totalVentas"></p>
-  <p id="ganancias"></p>
-
-  <h3>🏆 Top Productos</h3>
-  <ul id="topProductos"></ul>
-
-  <h3>📅 Ventas por Día</h3>
-  <canvas id="graficoDias" height="200"></canvas>
-
-  <h3>⚠️ Stock Bajo</h3>
-  <ul id="alertas"></ul>
-
-  <button onclick="inicio()">⬅ Volver</button>
 </div>
 
 <script>
-// CONFIG
-const urlInv = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
-const urlVentas = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/VENTAS";
 
-const FORM = "https://docs.google.com/forms/d/e/1FAIpQLSeoXDQp-aMlsrDCrq1r42QybYUgL-hdi1PiIWpRgnTc2A0STg/viewform";
-
-const ENTRY_PRODUCTO = "entry.1002750291";
-const ENTRY_TIPO = "entry.112461346";
-const ENTRY_CANTIDAD = "entry.838577118";
-const ENTRY_VENDEDOR = "entry.618694440";
-
-const admins = ["richar","admin"];
-
-const FORM_ADMIN = "https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform";
-const SHEETS_VENTAS = "https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/edit#gid=0";
-
-let inventario = [];
+// USUARIOS
+const usuariosSistema = {
+  luis:"123",
+  katy:"123",
+  katherine:"123",
+  richard:"123",
+  dante:"admin123"
+};
+const admins = ["dante"];
 
 // LOGIN
 function guardarUsuario(){
-  const user = document.getElementById("usuario").value;
-  if(user){
-    localStorage.setItem("usuario", user);
-    location.reload();
-  }
+  const user=usuario.value.toLowerCase();
+  const pass=password.value;
+
+  if(!usuariosSistema[user]) return errorLogin.innerText="Usuario no registrado";
+  if(usuariosSistema[user]!==pass) return errorLogin.innerText="Contraseña incorrecta";
+
+  localStorage.setItem("usuario",user);
+  location.reload();
 }
 
-window.onload = ()=>{
-  const user = localStorage.getItem("usuario");
+function cerrarSesion(){
+  localStorage.removeItem("usuario");
+  location.reload();
+}
+
+// UI
+window.onload=()=>{
+  const user=localStorage.getItem("usuario");
+
+  login.style.display=user?"none":"flex";
+  app.style.display=user?"block":"none";
 
   if(user){
-    document.getElementById("login").style.display="none";
-
-    const esAdmin = admins.includes(user.toLowerCase());
-
-    document.getElementById("userInfo").innerText =
-      "Usuario: " + user + (esAdmin ? " (ADMIN)" : " (VENDEDOR)");
-
-    if(esAdmin){
-      document.getElementById("panelBtn").style.display="block";
-    }
+    userInfo.innerHTML=`USUARIO: ${user.toUpperCase()}`;
+    if(admins.includes(user)) panelBtn.style.display="inline-block";
   }
 };
 
-// CARGAR INVENTARIO
+// INVENTARIO
+const urlInv="https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
+let inventario=[];
+let carrito=[];
+
 fetch(urlInv)
 .then(r=>r.json())
 .then(d=>{
-  inventario = d.map(p=>{
+  inventario=d.map(p=>{
     let o={};
-    Object.keys(p).forEach(k=>{
-      o[k.trim().toLowerCase()] = p[k];
-    });
-    return o;
+    Object.keys(p).forEach(k=>o[k.toLowerCase().trim()]=p[k]);
+
+    return {
+      id:o.id,
+      producto:o.producto,
+      categoria:(o.categoria||"").toUpperCase(),
+      talla:o.talla,
+      color:o.color,
+      stock:parseInt(o.stock)||0,
+      unidad:parseFloat(o["p.unidad"])||0,
+      docena:parseFloat(o["p.docena"])||0,
+      imagen:o.imagen
+    };
   });
 });
 
-// CATEGORÍAS (MAYÚSCULAS)
+// MENU
 function abrir(cat){
-  document.getElementById("menu").style.display="none";
-  document.getElementById("productos").style.display="flex";
-  document.getElementById("volver").style.display="block";
+  if(inventario.length===0){ alert("Cargando..."); return; }
 
-  let f = inventario.filter(p=>{
-    const categoria = (p.categoria || "").toString().toUpperCase();
-    return categoria === cat.toUpperCase();
-  });
+  menu.style.display="none";
+  productos.style.display="grid";
 
-  render(f);
+  const filtrados=inventario.filter(p=>p.categoria===cat && p.stock>0);
+
+  const unicos={};
+  filtrados.forEach(p=>{ if(!unicos[p.id]) unicos[p.id]=p; });
+
+  render(Object.values(unicos));
+
+  productos.innerHTML+=`<button onclick="inicio()">⬅ Volver</button>`;
 }
 
 function inicio(){
-  document.getElementById("menu").style.display="flex";
-  document.getElementById("productos").style.display="none";
-  document.getElementById("panel").style.display="none";
-  document.getElementById("dashboard").style.display="none";
-  document.getElementById("volver").style.display="none";
+  menu.style.display="grid";
+  productos.style.display="none";
+  panel.style.display="none";
 }
 
-// PRODUCTOS
+// LISTA
 function render(lista){
   let html="";
-
   lista.forEach(p=>{
     html+=`
-      <div class="card">
-        <img src="${p.imagen || ''}">
-        <h3>${p.producto}</h3>
-        <p>📦 ${p.stock}</p>
+    <div class="card" onclick="verProducto('${p.id}')">
+      <img src="${p.imagen}">
+      <h3>${p.producto}</h3>
+      <p style="color:lime;">S/ ${p.unidad}</p>
+    </div>`;
+  });
+  productos.innerHTML=html;
+}
 
-        <p>Unidad: S/ ${p.unidad}</p>
-        <p>Docena: S/ ${p.docena}</p>
-        <p>Cajón: S/ ${p.cajon}</p>
+// DETALLE
+function verProducto(id){
 
-        <button onclick="vender('${p.producto}','UNIDAD')">Unidad</button>
-        <button onclick="vender('${p.producto}','DOCENA')">Docena</button>
-        <button onclick="vender('${p.producto}','CAJON')">Cajón</button>
+  const variantes=inventario.filter(p=>p.id==id);
+  const p=variantes[0];
+
+  const tallas=[...new Set(variantes.map(v=>v.talla).filter(t=>t))];
+  const stockTotal=variantes.reduce((a,b)=>a+b.stock,0);
+
+  productos.innerHTML=`
+    <div>
+      <img class="detalle-img" src="${p.imagen}">
+      <h2>${p.producto}</h2>
+
+      <div class="fila-opciones">
+        <div>
+          🧵 TALLAS
+          <select id="tallaSelect" onchange="cambiarTalla('${id}')">
+            ${tallas.map(t=>`<option value="${t}">${t}</option>`).join("")}
+            <option value="TODAS">TODAS</option>
+          </select>
+        </div>
+
+        <div>📦 STOCK <span class="stock" id="stockTalla">0</span></div>
+        <div>📊 TOTAL <span class="total">${stockTotal}</span></div>
       </div>
-    `;
+
+      <table id="tablaDetalle"></table>
+
+      <button onclick="agregarCarrito('${id}')">🛒 Agregar al carrito</button>
+      <button onclick="verCarrito()">🧾 Ver carrito</button>
+      <button onclick="volverLista('${p.categoria}')">⬅ Volver</button>
+    </div>
+  `;
+
+  cambiarTalla(id);
+}
+
+// FILTRO
+function cambiarTalla(id){
+  const talla=document.getElementById("tallaSelect").value;
+
+  let filtrados = talla==="TODAS"
+    ? inventario.filter(p=>p.id==id)
+    : inventario.filter(p=>p.id==id && p.talla==talla);
+
+  const total=filtrados.reduce((a,b)=>a+b.stock,0);
+  document.getElementById("stockTalla").innerText=total;
+
+  let filas=`<tr>
+      <th>TALLA</th><th>COLOR</th><th>STOCK</th><th>P.UNIDAD</th><th>P.DOCENA</th>
+    </tr>`;
+
+  filtrados.forEach(v=>{
+    filas+=`
+      <tr>
+        <td>${v.talla}</td>
+        <td>${v.color}</td>
+        <td>${v.stock}</td>
+        <td>S/ ${v.unidad}</td>
+        <td>S/ ${v.docena}</td>
+      </tr>`;
   });
 
-  document.getElementById("productos").innerHTML = html;
+  document.getElementById("tablaDetalle").innerHTML=filas;
 }
 
-// VENDER
-function vender(prod,tipo){
-  const vendedor = localStorage.getItem("usuario") || "SinNombre";
+// CARRITO
+function agregarCarrito(id){
+  const talla=document.getElementById("tallaSelect").value;
 
-  const link = FORM + "?" +
-    ENTRY_PRODUCTO + "=" + encodeURIComponent(prod) +
-    "&" + ENTRY_TIPO + "=" + tipo +
-    "&" + ENTRY_CANTIDAD + "=1" +
-    "&" + ENTRY_VENDEDOR + "=" + encodeURIComponent(vendedor);
+  if(talla==="TODAS"){ alert("Selecciona talla"); return; }
 
-  window.open(link,"_blank");
+  const item=inventario.find(p=>p.id==id && p.talla==talla);
+
+  if(!item || item.stock<=0){ alert("Sin stock"); return; }
+
+  carrito.push({
+    id:item.id,
+    producto:item.producto,
+    talla:item.talla,
+    color:item.color,
+    precio:item.unidad,
+    cantidad:1
+  });
+
+  alert("Agregado al carrito");
 }
+
+function verCarrito(){
+
+  if(carrito.length===0){ alert("Vacío"); return; }
+
+  let total=0;
+
+  let html=`<h2>🛒 Carrito</h2><table>
+  <tr><th>Prod</th><th>Talla</th><th>Cant</th><th>Precio</th></tr>`;
+
+  carrito.forEach(c=>{
+    total+=c.precio*c.cantidad;
+    html+=`<tr>
+      <td>${c.producto}</td>
+      <td>${c.talla}</td>
+      <td>${c.cantidad}</td>
+      <td>S/ ${c.precio}</td>
+    </tr>`;
+  });
+
+  html+=`</table>
+  <h3>Total: S/ ${total}</h3>
+  <button onclick="finalizarVenta()">✅ Vender</button>
+  <button onclick="vaciarCarrito()">🗑 Vaciar</button>
+  <button onclick="inicio()">⬅ Volver</button>`;
+
+  productos.innerHTML=html;
+}
+
+function finalizarVenta(){
+
+  carrito.forEach(item=>{
+    const prod=inventario.find(p=>p.id==item.id && p.talla==item.talla);
+    if(prod){
+      prod.stock-=item.cantidad;
+      if(prod.stock<0) prod.stock=0;
+    }
+  });
+
+  alert("Venta realizada");
+  carrito=[];
+  inicio();
+}
+
+function vaciarCarrito(){
+  carrito=[];
+  alert("Carrito vacío");
+  inicio();
+}
+
+// VOLVER
+function volverLista(cat){ abrir(cat); }
 
 // PANEL
 function abrirPanel(){
-  document.getElementById("menu").style.display="none";
-  document.getElementById("panel").style.display="block";
+  menu.style.display="none";
+  panel.style.display="block";
 }
 
 function abrirFormulario(){
-  window.open(FORM_ADMIN,"_blank");
+  window.open("https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform");
 }
 
 function verVentas(){
-  window.open(SHEETS_VENTAS,"_blank");
+  window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE");
 }
 
-// DASHBOARD
-function abrirDashboard(){
-  document.getElementById("panel").style.display="none";
-  document.getElementById("dashboard").style.display="block";
-  cargarDashboard();
-}
-
-function cargarDashboard(){
-  fetch(urlVentas)
-  .then(r=>r.json())
-  .then(ventas=>{
-    let total=0, dinero=0, productos={}, dias={};
-
-    ventas.forEach(v=>{
-      let prod=v.Producto?.toLowerCase();
-      let tipo=v.Tipo?.toLowerCase();
-      let cant=Number(v.Cantidad)||0;
-
-      total+=cant;
-
-      let item = inventario.find(i=>i.producto.toLowerCase()===prod);
-      let precio=0;
-
-      if(item){
-        if(tipo==="unidad") precio=item.unidad;
-        if(tipo==="docena") precio=item.docena;
-        if(tipo==="cajon") precio=item.cajon;
-      }
-
-      dinero+=precio*cant;
-
-      productos[prod]=(productos[prod]||0)+cant;
-
-      let dia=(v.Fecha||"").split(" ")[0];
-      dias[dia]=(dias[dia]||0)+cant;
-    });
-
-    document.getElementById("totalVentas").innerText="Total: "+total;
-    document.getElementById("ganancias").innerText="Ganancias: S/ "+dinero;
-
-    mostrarTop(productos);
-    graficoDias(dias);
-    alertasStock();
-  });
-}
-
-function mostrarTop(p){
-  let ul=document.getElementById("topProductos");
-  ul.innerHTML="";
-  Object.entries(p).sort((a,b)=>b[1]-a[1]).slice(0,5)
-  .forEach(x=>{
-    let li=document.createElement("li");
-    li.innerText=x[0]+" - "+x[1];
-    ul.appendChild(li);
-  });
-}
-
-function graficoDias(d){
-  let c=document.getElementById("graficoDias");
-  let ctx=c.getContext("2d");
-  ctx.clearRect(0,0,c.width,c.height);
-
-  let dias=Object.keys(d), vals=Object.values(d);
-  let max=Math.max(...vals,1);
-  let w=c.width/dias.length;
-
-  vals.forEach((v,i)=>{
-    let h=(v/max)*150;
-    ctx.fillStyle="orange";
-    ctx.fillRect(i*w,200-h,w-10,h);
-    ctx.fillStyle="white";
-    ctx.fillText(dias[i], i*w,190);
-  });
-}
-
-function alertasStock(){
-  let ul=document.getElementById("alertas");
-  ul.innerHTML="";
-
-  inventario.forEach(p=>{
-    if(Number(p.stock)<=5){
-      let li=document.createElement("li");
-      li.innerText=p.producto+" (Stock: "+p.stock+")";
-      ul.appendChild(li);
-    }
-  });
-}
 </script>
 
 </body>
