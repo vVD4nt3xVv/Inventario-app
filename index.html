@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A&T KAMIARA</title>
+    <title>A&T KAMIARA - Inventario</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,44 +13,56 @@
 <!-- LOGIN -->
 <div id="login">
   <div class="login-box">
-    <h3>Bienvenido</h3>
+    <h3 style="color:white; margin-bottom:20px;">A&T KAMIARA</h3>
     <input id="usuario" placeholder="Usuario">
     <input id="password" type="password" placeholder="Contraseña">
-    <button onclick="guardarUsuario()">Entrar</button>
-    <p id="errorLogin"></p>
+    <button onclick="guardarUsuario()">ENTRAR</button>
+    <p id="errorLogin" style="color:red; font-size:12px; margin-top:10px;"></p>
   </div>
 </div>
 
-<!-- APP -->
+<!-- APP CONTAINER -->
 <div id="app" style="display:none;">
     <div id="userInfo"></div>
 
     <div class="top-buttons">
       <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-      <button id="btnVerCarrito" onclick="verCarrito()">🛒 Carrito (0)</button>
+      <button id="btnVerCarrito" class="btn-carrito" onclick="verCarrito()">🛒 Carrito (0)</button>
       <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
     </div>
 
     <div id="portada">
-      <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
+      <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG" alt="Banner A&T">
       <div class="titulo">CONTROL DE INVENTARIO</div>
-      <div class="sub">---------------------------------------------------</div>
+      <div class="sub">──────────────────────────</div>
     </div>
 
-    <!-- Menú -->
-    <div id="menu" class="grid-menu">
-      <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
-      <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
-      <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
-      <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
+    <!-- Menú Principal -->
+    <div id="menu" class="grid-layout">
+      <div class="menu-card" onclick="abrir('INVIERNO')">
+          <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK">
+          <p>INVIERNO</p>
+      </div>
+      <div class="menu-card" onclick="abrir('VERANO')">
+          <img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx">
+          <p>VERANO</p>
+      </div>
+      <div class="menu-card" onclick="abrir('TECNOLOGIA')">
+          <img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq">
+          <p>TECNOLOGÍA</p>
+      </div>
+      <div class="menu-card" onclick="abrir('NAVIDEÑO')">
+          <img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p">
+          <p>NAVIDEÑO</p>
+      </div>
     </div>
 
-    <!-- Lista de Productos -->
-    <div id="productos" class="grid-menu"></div>
+    <!-- Listado de Productos -->
+    <div id="productos" class="grid-layout"></div>
 
-    <!-- Carrito de Compras -->
+    <!-- Carrito -->
     <div id="carrito" style="display:none; padding:15px;">
-        <h2>CARRITO</h2>
+        <h2 style="text-align:center; border-bottom:1px solid #333; padding-bottom:10px;">MI CARRITO</h2>
         <div id="lista-carrito"></div>
         <div class="resumen-total">
             <div class="fila-resumen">
@@ -61,22 +73,22 @@
                 </div>
             </div>
             <div class="fila-resumen total-grande">
-                <span>TOTAL FINAL:</span>
+                <span>TOTAL:</span>
                 <span id="precioTotalCarrito">S/ 0.00</span>
             </div>
         </div>
         <div class="botones-carrito">
-            <button class="btn-volver" onclick="inicio()">⬅ Volver</button>
+            <button class="btn-back" onclick="inicio()">⬅ Volver</button>
             <button class="btn-pagar" onclick="pagar()">Pagar</button>
         </div>
     </div>
 
-    <!-- Panel de Administración -->
-    <div id="panel">
-      <h2>Panel Admin</h2>
-      <button onclick="abrirFormulario()">➕ Agregar Producto</button>
-      <button onclick="verVentas()">📊 Ver Ventas</button>
-      <button onclick="inicio()" class="btn-volver">⬅ Volver</button>
+    <!-- Panel Admin -->
+    <div id="panel" style="display:none; padding:20px;">
+      <h2 style="text-align:center;">Panel de Control</h2>
+      <button onclick="abrirFormulario()" style="background:#007bff; color:white;">➕ Agregar Producto</button>
+      <button onclick="verVentas()" style="background:#17a2b8; color:white;">📊 Ver Ventas (Sheets)</button>
+      <button onclick="inicio()" style="background:#444; color:white;">⬅ Regresar</button>
     </div>
 </div>
 
