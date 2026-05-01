@@ -1,6 +1,13 @@
-body { background:linear-gradient(135deg,#0b0b0b,#1a1a1a); color:white; font-family:Arial, sans-serif; margin:0; max-width:480px; margin:auto; min-height:100vh; }
+/* --- BASE --- */
+body {
+  background: linear-gradient(135deg,#0b0b0b,#1a1a1a);
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
-/* NOTIFICACIONES (TIPO TOAST) */
+/* NOTIFICACIONES */
 #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 350px; }
 .toast { background: #28a745; color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: slideDown 0.5s, fadeOut 0.5s 2.5s forwards; }
 .toast.error { background: #dc3545; }
@@ -8,44 +15,60 @@ body { background:linear-gradient(135deg,#0b0b0b,#1a1a1a); color:white; font-fam
 @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 0; opacity: 1; } }
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-/* LOGIN Y UI */
+/* LOGIN */
 #login { display:flex; align-items:center; justify-content:center; height:100vh; }
-.login-box { background:#111; padding:20px; border-radius:20px; width:90%; text-align:center; }
-.login-box input, .login-box button { width:100%; padding:12px; margin:6px 0; border:none; border-radius:10px; }
-.login-box input { background:#222; color:white; }
-.login-box button { background:red; color:white; font-weight:bold; }
-#userInfo { text-align:center; margin-top:10px; font-weight:bold; }
-.top-buttons { display:flex; justify-content:center; gap:10px; margin:10px; }
-.btn-salir { background:red; padding:8px 15px; border-radius:8px; border:none; color:white; cursor:pointer; }
-.btn-admin { background:#007bff; padding:8px 15px; border-radius:8px; border:none; color:white; display:none; }
+.login-box { background:#111; padding:20px; border-radius:20px; width:90%; max-width:320px; text-align:center; }
+.login-box input { width:100%; padding:12px; margin:6px 0; border:none; border-radius:10px; background:#222; color:white; box-sizing:border-box; }
+.login-box button { width:100%; padding:12px; background:red; color:white; border:none; border-radius:10px; font-weight:bold; }
 
-/* MENU & CARDS */
-.grid-menu { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px; }
+/* HEADER */
+#userInfo { text-align:center; margin-top:10px; font-weight:bold; }
+.top-buttons { display:flex; justify-content:center; gap:10px; margin:15px 10px; }
+.btn-salir { background:red; color:white; border:none; padding:8px 15px; border-radius:8px; }
+#btnVerCarrito { background:#28a745; color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:bold; }
+.btn-admin { background:#007bff; color:white; border:none; padding:8px 15px; border-radius:8px; display:none; }
+
+/* PORTADA */
+#portada img { width: 100%; height: 100px; object-fit: cover; }
+.titulo { text-align: center; font-size: 20px; margin-top: 10px; }
+.sub { text-align: center; color: gray; font-size: 12px; margin-bottom: 10px; }
+
+/* --- GRID RESPONSIVO (CLAVE) --- */
+.grid-menu, #productos {
+  display: none;
+  grid-template-columns: repeat(2, 1fr); /* SIEMPRE 2 EN CELULAR */
+  gap: 10px;
+  padding: 10px;
+}
+
+@media (min-width: 768px) {
+  #app { max-width: 1000px; margin: auto; }
+  .grid-menu, #productos { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+  #portada img { height: 180px; }
+}
+
+/* CARDS */
 .menu-card, .card { background:#111; border-radius:15px; overflow:hidden; text-align:center; cursor:pointer; padding-bottom:10px; }
 .menu-card img, .card img { width:100%; height:120px; object-fit:cover; }
-#productos { display:none; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px; }
 
-/* TABLAS Y SELECTORES */
-table { width:100%; margin-top:10px; background:#111; border-radius:10px; border-collapse: collapse; }
-th, td { padding:8px; font-size:12px; text-align:center; border-bottom: 1px solid #222; }
+/* DETALLES */
 .fila-opciones { display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#111; padding:12px; border-radius:10px; margin:10px; font-size:13px; }
-select { background:#222; color:white; border:1px solid #444; border-radius:5px; padding:5px; width:100%; }
+select { background:#222; color:white; border:1px solid #444; border-radius:5px; padding:5px; }
+table { width:100%; background:#111; border-radius:10px; border-collapse: collapse; margin-top:10px; }
+th, td { padding:8px; font-size:12px; border-bottom: 1px solid #222; }
 
 /* CARRITO */
 .item-carrito { background:#1a1a1a; border-radius:10px; padding:10px; margin-bottom:10px; border-left:4px solid #28a745; }
-.info-principal { font-weight:bold; display:flex; justify-content:space-between; margin-bottom:5px; }
+.info-principal { display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px; }
 .grid-carrito { display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:5px; align-items:center; font-size:12px; }
-.controles-cant { display:flex; align-items:center; gap:5px; background:#222; border-radius:5px; padding:2px; justify-content: center; }
-.btn-cant { background:#444; width:25px; padding:2px; margin:0; border:none; color:white; border-radius:4px; }
-.btn-eliminar { background:none; color:red; font-weight:bold; width:auto; margin:0; padding:0; border:none; cursor:pointer; }
+.controles-cant { display:flex; gap:5px; background:#222; padding:3px; border-radius:5px; justify-content:center; }
+.btn-cant { background:#444; border:none; color:white; width:22px; border-radius:3px; }
 .resumen-total { margin-top:20px; border-top:1px solid #444; padding-top:15px; }
-.fila-resumen { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .total-grande { font-size:20px; font-weight:bold; color:#00aaff; }
-.input-desc { display:flex; gap:5px; }
 #montoDescuento { width:60px; background:#222; color:white; border:1px solid #444; text-align:center; }
-.btn-aplicar { background:#28a745; width:auto; margin:0; padding:5px 10px; font-size:11px; border:none; border-radius:5px; color:white;}
 .botones-carrito { display:flex; gap:10px; }
-.btn-volver { background:#555; border:none; color:white; }
-.btn-pagar { background:#28a745; border:none; color:white; }
+
+/* BOTONES GENERALES */
+button { width:100%; padding:12px; border-radius:10px; border:none; cursor:pointer; margin-top:10px; font-size:14px; }
+.btn-full { grid-column: 1 / -1; background:#444; color:white; }
 #panel { display:none; padding:20px; }
-button { cursor:pointer; }
