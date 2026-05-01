@@ -16,7 +16,7 @@ function showToast(msj, tipo = "success") {
 function guardarUsuario(){
     const user = document.getElementById("usuario").value.toLowerCase();
     const pass = document.getElementById("password").value;
-    if(!usuariosSistema[user] || usuariosSistema[user] !== pass) return document.getElementById("errorLogin").innerText = "Credenciales incorrectas";
+    if(!usuariosSistema[user] || usuariosSistema[user] !== pass) return document.getElementById("errorLogin").innerText = "Error de acceso";
     localStorage.setItem("usuario", user);
     location.reload();
 }
@@ -24,15 +24,15 @@ function cerrarSesion(){ localStorage.removeItem("usuario"); location.reload(); 
 
 window.onload = () => {
     const user = localStorage.getItem("usuario");
-    document.getElementById("login").style.display = user ? "none" : "flex";
-    document.getElementById("app").style.display = user ? "block" : "none";
     if(user){
+        document.getElementById("login").style.display = "none";
+        document.getElementById("app").style.display = "block";
         document.getElementById("userInfo").innerHTML = `USUARIO: ${user.toUpperCase()}`;
         if(admins.includes(user)) document.getElementById("panelBtn").style.display = "inline-block";
     }
 };
 
-// DATOS
+// CARGA DE DATOS
 const urlInv = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
 fetch(urlInv).then(r => r.json()).then(d => {
     inventario = d.map(p => {
@@ -69,7 +69,7 @@ function renderLista(lista) {
     lista.forEach(p => {
         html += `<div class="card" onclick="verProducto('${p.id}')"><img src="${p.imagen}"><h3>${p.producto}</h3><p style="color:lime;">S/ ${p.unidad}</p></div>`;
     });
-    document.getElementById("productos").innerHTML = html + `<button onclick="inicio()" style="grid-column: span 2;">⬅ Volver al Menú</button>`;
+    document.getElementById("productos").innerHTML = html + `<button onclick="inicio()" class="btn-full">⬅ Volver al Menú</button>`;
 }
 
 // DETALLE PRODUCTO
@@ -79,26 +79,16 @@ function verProducto(id) {
     const tallas = [...new Set(variantes.map(v => v.talla))];
     
     document.getElementById("productos").innerHTML = `
-        <div style="grid-column: span 2; padding:10px; background:#111; border-radius:20px;">
-            <img style="width:100%; border-radius:15px; height:250px; object-fit:cover;" src="${p.imagen}">
-            <h2 style="margin:10px 0;">${p.producto}</h2>
-            
+        <div style="grid-column: span 1 / -1; background:#111; border-radius:20px; padding:15px;">
+            <img style="width:100%; border-radius:15px; height:180px; object-fit:cover;" src="${p.imagen}">
+            <h2>${p.producto}</h2>
             <div class="fila-opciones">
-                <div>🧵 TALLA 
-                    <select id="selTalla" onchange="actualizarColores('${id}')">
-                        ${tallas.map(t => `<option value="${t}">${t}</option>`).join("")}
-                    </select>
-                </div>
-                <div>🎨 COLOR 
-                    <select id="selColor"></select>
-                </div>
+                <div>🧵 TALLA <select id="selTalla" onchange="actualizarColores('${id}')">${tallas.map(t => `<option value="${t}">${t}</option>`).join("")}</select></div>
+                <div>🎨 COLOR <select id="selColor"></select></div>
             </div>
-
-            <button onclick="addDesdeBoton('${id}')" style="background:#28a745; font-weight:bold;">🛒 AÑADIR AL CARRITO</button>
-            
-            <h3 style="margin-top:20px;">Variantes Disponibles</h3>
+            <button onclick="addDesdeBoton('${id}')" style="background:#28a745; font-weight:bold; color:white;">🛒 AÑADIR AL CARRITO</button>
             <table id="tablaDetalle"></table>
-            <button onclick="abrir('${p.categoria}')" style="background:#444;">⬅ Volver a Lista</button>
+            <button onclick="abrir('${p.categoria}')" class="btn-full" style="background:#333;">⬅ Volver a Lista</button>
         </div>`;
     actualizarColores(id);
 }
@@ -106,12 +96,10 @@ function verProducto(id) {
 function actualizarColores(id) {
     const talla = document.getElementById("selTalla").value;
     const colores = inventario.filter(v => v.id == id && v.talla == talla);
-    document.getElementById("selColor").innerHTML = colores.map(c => `<option value="${c.color}">${c.color} (Stock: ${c.stock})</option>`).join("");
+    document.getElementById("selColor").innerHTML = colores.map(c => `<option value="${c.color}">${c.color} (${c.stock})</option>`).join("");
     
-    let filas = `<tr><th>TALLA</th><th>COLOR</th><th>STOCK</th><th>UNID.</th><th>DOC.</th></tr>`;
-    colores.forEach(v => {
-        filas += `<tr><td>${v.talla}</td><td>${v.color}</td><td>${v.stock}</td><td>${v.unidad}</td><td>${v.docena}</td></tr>`;
-    });
+    let filas = `<tr><th>COLOR</th><th>STOCK</th><th>UNID.</th><th>DOC.</th></tr>`;
+    colores.forEach(v => { filas += `<tr><td>${v.color}</td><td>${v.stock}</td><td>${v.unidad}</td><td>${v.docena}</td></tr>`; });
     document.getElementById("tablaDetalle").innerHTML = filas;
 }
 
@@ -124,13 +112,15 @@ function addDesdeBoton(id) {
 // CARRITO
 function agregarAlCarrito(id, talla, color) {
     const item = inventario.find(p => p.id == id && p.talla == talla && p.color == color);
-    if(!item || item.stock <= 0) return showToast("Sin stock disponible", "error");
-
     const existe = carrito.find(c => c.id == id && c.talla == talla && c.color == color);
     if(existe) existe.cantidad++; else carrito.push({ ...item, cantidad: 1 });
-    
-    showToast(`Se añadió: ${item.producto} (${talla})`);
-    renderCarrito();
+    showToast(`Añadido: ${item.producto}`);
+    actualizarContador();
+}
+
+function actualizarContador() {
+    const cant = carrito.reduce((a, b) => a + b.cantidad, 0);
+    document.getElementById("btnVerCarrito").innerText = `🛒 Carrito (${cant})`;
 }
 
 function verCarrito() {
@@ -142,60 +132,30 @@ function verCarrito() {
 
 function renderCarrito() {
     const lista = document.getElementById("lista-carrito");
-    let html = "", subtotal = 0, cantTotal = 0;
-
+    let html = "", subtotal = 0;
     carrito.forEach((item, index) => {
         const precio = item.cantidad >= 12 ? item.docena : item.unidad;
         const totalItem = precio * item.cantidad;
         subtotal += totalItem;
-        cantTotal += item.cantidad;
-
         html += `
         <div class="item-carrito">
             <div class="info-principal"><span>${item.producto}</span> <button class="btn-eliminar" onclick="eliminarItem(${index})">X</button></div>
             <div class="grid-carrito">
                 <span>T: ${item.talla}</span><span>C: ${item.color}</span>
-                <div class="controles-cant">
-                    <button class="btn-cant" onclick="cambiarCant(${index},-1)">-</button>
-                    <span style="min-width:15px; text-align:center;">${item.cantidad}</span>
-                    <button class="btn-cant" onclick="cambiarCant(${index},1)">+</button>
-                </div>
+                <div class="controles-cant"><button class="btn-cant" onclick="cambiarCant(${index},-1)">-</button><span>${item.cantidad}</span><button class="btn-cant" onclick="cambiarCant(${index},1)">+</button></div>
                 <span style="text-align:right; font-weight:bold;">S/ ${totalItem.toFixed(2)}</span>
             </div>
+            <small style="color:${item.cantidad >= 12 ? '#00ff88' : 'gray'}">${item.cantidad >= 12 ? '✓ Precio Docena' : 'Precio Unitario'}</small>
         </div>`;
     });
-
-    lista.innerHTML = html || "<p style='text-align:center; color:gray;'>Tu carrito está vacío</p>";
-    document.getElementById("btnVerCarrito").innerText = `🛒 Carrito (${cantTotal})`;
+    lista.innerHTML = html || "<p style='text-align:center'>Vacío</p>";
     document.getElementById("precioTotalCarrito").innerText = `S/ ${(subtotal - descuentoGlobal).toFixed(2)}`;
 }
 
-function cambiarCant(i, v) { 
-    carrito[i].cantidad += v; 
-    if(carrito[i].cantidad <= 0) return eliminarItem(i); 
-    renderCarrito(); 
-}
-
-function eliminarItem(i) { 
-    const nombre = carrito[i].producto;
-    carrito.splice(i, 1); 
-    showToast(`Se eliminó: ${nombre}`, "error");
-    renderCarrito(); 
-}
-
-function aplicarDescuento() { 
-    descuentoGlobal = parseFloat(document.getElementById("montoDescuento").value) || 0; 
-    showToast("Descuento aplicado");
-    renderCarrito(); 
-}
-
+function cambiarCant(i, v) { carrito[i].cantidad += v; if(carrito[i].cantidad <= 0) return eliminarItem(i); renderCarrito(); actualizarContador(); }
+function eliminarItem(i) { showToast(`Eliminado: ${carrito[i].producto}`, "error"); carrito.splice(i, 1); renderCarrito(); actualizarContador(); }
+function aplicarDescuento() { descuentoGlobal = parseFloat(document.getElementById("montoDescuento").value) || 0; renderCarrito(); }
 function abrirPanel() { document.getElementById("menu").style.display="none"; document.getElementById("panel").style.display="block"; }
 function abrirFormulario() { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform"); }
 function verVentas() { window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE"); }
-function pagar() { 
-    if(carrito.length === 0) return showToast("El carrito está vacío", "error");
-    alert("¡Pedido generado! Gracias por su compra."); 
-    carrito = []; 
-    renderCarrito(); 
-    inicio(); 
-}
+function pagar() { if(carrito.length === 0) return showToast("Carrito vacío", "error"); alert("Pedido registrado"); carrito = []; actualizarContador(); inicio(); }
