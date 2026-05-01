@@ -8,6 +8,7 @@
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login">
   <div class="login-box">
     <h3>Bienvenido</h3>
@@ -18,6 +19,7 @@
   </div>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
     <div id="userInfo"></div>
 
@@ -33,6 +35,7 @@
       <div class="sub">-----------------------------------------------------------------------------------</div>
     </div>
 
+    <!-- Menú Principal -->
     <div id="menu" class="grid-menu">
       <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
       <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
@@ -40,8 +43,10 @@
       <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
     </div>
 
+    <!-- Contenedor dinámico de productos -->
     <div id="productos"></div>
 
+    <!-- Vista del Carrito -->
     <div id="seccion-carrito" style="display:none; padding:15px;">
         <h2>Mi Carrito</h2>
         <div id="lista-carrito"></div>
@@ -51,10 +56,11 @@
                 <span id="totalCarrito">S/ 0.00</span>
             </h3>
         </div>
-        <button class="btn-finalizar" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
-        <button class="btn-volver" onclick="inicio()">⬅ Volver</button>
+        <button class="btn-pedido" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
+        <button class="btn-volver" onclick="inicio()">⬅ Volver al Menú</button>
     </div>
 
+    <!-- Panel Admin -->
     <div id="panel">
       <h2>Panel Admin</h2>
       <button onclick="abrirFormulario()">➕ Agregar Producto</button>
