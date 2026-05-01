@@ -39,23 +39,18 @@ body {
   margin:6px 0;
   border:none;
   border-radius:10px;
-  font-size:14px;
 }
 
 .login-box input {background:#222;color:white;}
 .login-box button {background:red;color:white;}
 
-#errorLogin {color:#ff4d4d;}
-
-/* HEADER */
+/* APP */
 #userInfo {
   text-align:center;
   margin-top:10px;
   font-weight:bold;
-  font-size:16px;
 }
 
-/* BOTONES */
 .top-buttons {
   display:flex;
   justify-content:center;
@@ -63,19 +58,8 @@ body {
   margin:10px;
 }
 
-.btn-salir, .btn-admin {
-  padding:8px 18px;
-  border-radius:8px;
-  font-size:13px;
-}
-
-.btn-salir {background:red;}
-.btn-admin {background:#007bff;display:none;}
-
-/* PORTADA */
-#portada img {width:100%;height:200px;object-fit:cover;}
-.titulo {text-align:center;font-size:24px;}
-.sub {text-align:center;color:gray;font-size:14px;}
+.btn-salir {background:red;padding:8px;border-radius:8px;}
+.btn-admin {background:#007bff;padding:8px;border-radius:8px;display:none;}
 
 /* MENU */
 .grid-menu {
@@ -99,10 +83,6 @@ body {
   object-fit:cover;
 }
 
-.menu-card p {
-  font-size:16px;
-}
-
 /* PRODUCTOS */
 #productos {
   display:none;
@@ -116,18 +96,7 @@ body {
   border-radius:15px;
   padding:10px;
   text-align:center;
-  cursor:pointer;
 }
-
-.card img {
-  width:100%;
-  height:140px;
-  object-fit:cover;
-  border-radius:10px;
-}
-
-.card h3 {font-size:16px;}
-.card p {font-size:14px;}
 
 /* DETALLE */
 .detalle-img {
@@ -139,45 +108,15 @@ body {
 .fila-opciones {
   display:flex;
   justify-content:space-between;
-  align-items:center;
   background:#111;
   padding:12px;
   border-radius:10px;
   margin-top:10px;
-  gap:10px;
-  text-align:center;
   font-size:14px;
 }
 
-.fila-opciones div {
-  flex:1;
-}
-
-/* COLORES */
-.stock {
-  color:#00ff88;
-  font-weight:bold;
-  margin-left:5px;
-  font-size:15px;
-}
-
-.total {
-  color:#00aaff;
-  font-weight:bold;
-  margin-left:5px;
-  font-size:15px;
-}
-
-/* SELECT */
-select {
-  background:#222;
-  color:white;
-  border:none;
-  border-radius:8px;
-  padding:6px;
-  margin-left:5px;
-  font-size:14px;
-}
+.stock {color:#00ff88;}
+.total {color:#00aaff;}
 
 /* TABLA */
 table {
@@ -188,144 +127,188 @@ table {
   text-align:center;
 }
 
-th,td {
-  padding:8px;
-  font-size:14px;
+th,td {padding:8px;}
+
+/* CARRITO */
+#carrito {
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  padding:15px;
 }
 
-/* BOTONES */
-button {
+.carrito-box {
+  width:100%;
+  background:#111;
+  border-radius:15px;
+  padding:12px;
+}
+
+.carrito-titulo {
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.carrito-item {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  text-align:center;
+  padding:8px;
+  border-bottom:1px solid #333;
+  font-size:13px;
+}
+
+.carrito-total {
+  margin-top:10px;
+  text-align:right;
+  color:#00aaff;
+  font-weight:bold;
+}
+
+.btn-descuento {
+  background:green;
   width:100%;
   margin-top:10px;
-  padding:12px;
+  padding:10px;
   border:none;
   border-radius:10px;
-  background:red;
   color:white;
-  font-size:15px;
 }
-
-h2 {text-align:center;}
-
-#panel {display:none;padding:20px;}
-
-/* NUEVO */
-#carritoVista {display:none;padding:10px;}
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
 <div id="login">
   <div class="login-box">
-    <h3>Bienvenido</h3>
+    <h3>LOGIN</h3>
     <input id="usuario" placeholder="Usuario">
     <input id="password" type="password" placeholder="Contraseña">
     <button onclick="guardarUsuario()">Entrar</button>
-    <p id="errorLogin"></p>
   </div>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
 
 <div id="userInfo"></div>
 
 <div class="top-buttons">
   <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-  <button style="background:green;" onclick="verCarrito()">🛒</button>
-  <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
-</div>
-
-<div id="portada">
-  <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
-  <div class="titulo">CONTROL DE INVENTARIO</div>
-  <div class="sub">---</div>
+  <button class="btn-admin" id="panelBtn">Panel</button>
 </div>
 
 <div id="menu" class="grid-menu">
-  <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
-  <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
+  <div class="menu-card" onclick="abrir('INVIERNO')">INVIERNO</div>
+  <div class="menu-card" onclick="abrir('VERANO')">VERANO</div>
 </div>
 
 <div id="productos"></div>
-<div id="carritoVista"></div>
 
-<div id="panel">
-  <h2>Panel Admin</h2>
-  <button onclick="abrirFormulario()">➕ Agregar Producto</button>
-  <button onclick="verVentas()">📊 Ver Ventas</button>
-  <button onclick="inicio()">⬅ Volver</button>
-</div>
+<!-- CARRITO -->
+<div id="carrito"></div>
 
 </div>
 
 <script>
 
-// 🔥 NUEVO
+/* LOGIN */
+const usuarios={luis:"123",dante:"admin123"};
+const admins=["dante"];
+
+function guardarUsuario(){
+  const u=usuario.value.toLowerCase();
+  const p=password.value;
+  if(usuarios[u]!==p) return alert("error");
+  localStorage.setItem("u",u);
+  location.reload();
+}
+
+function cerrarSesion(){
+  localStorage.removeItem("u");
+  location.reload();
+}
+
+window.onload=()=>{
+  const u=localStorage.getItem("u");
+  login.style.display=u?"none":"flex";
+  app.style.display=u?"block":"none";
+  if(u) userInfo.innerText="USUARIO: "+u;
+};
+
+/* INVENTARIO */
+let inventario=[];
+fetch("https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO")
+.then(r=>r.json())
+.then(d=>inventario=d);
+
+/* CARRITO */
 let carrito=[];
 
-function verCarrito(){
+function agregarCarrito(p){
+  carrito.push({
+    producto:p.producto,
+    talla:p.talla,
+    color:p.color,
+    unidad:parseFloat(p.unidad),
+    docena:parseFloat(p.docena),
+    cantidad:1
+  });
+  renderCarrito();
+}
 
-  productos.style.display="none";
-  menu.style.display="none";
-  carritoVista.style.display="block";
+function calcularPrecio(p){
+  if(p.cantidad<12) return p.unidad*p.cantidad;
+  const d=Math.floor(p.cantidad/12);
+  const r=p.cantidad%12;
+  return (d*p.docena)+(r*p.unidad);
+}
 
-  let html=`<h2>🛒 Carrito</h2>`;
+function renderCarrito(){
 
-  if(carrito.length===0){
-    html+=`<p style="text-align:center;">Carrito vacío</p>
-    <button onclick="cerrarCarrito()">⬅ Volver</button>`;
-    carritoVista.innerHTML=html;
-    return;
-  }
+  carrito.style.display="flex";
 
   let total=0;
 
-  html+=`<table>
-  <tr><th>Talla</th><th>Color</th><th>Cant</th><th>Total</th></tr>`;
+  let html=`
+  <div class="carrito-box">
+    <div class="carrito-titulo">CARRITO</div>
 
-  carrito.forEach((c,i)=>{
-    let precio=(c.cantidad>=12)?c.docena:c.unidad;
-    let sub=precio*c.cantidad;
-    total+=sub;
+    <div class="carrito-item">
+      <div>Prod</div><div>Talla</div><div>Cant</div><div>Total</div>
+    </div>
+  `;
+
+  carrito.forEach(p=>{
+    const t=calcularPrecio(p);
+    total+=t;
 
     html+=`
-    <tr>
-      <td>${c.talla}</td>
-      <td>${c.color}</td>
-      <td>
-        <button onclick="restar(${i})">-</button>
-        ${c.cantidad}
-        <button onclick="sumar(${i})">+</button>
-      </td>
-      <td>S/ ${sub}</td>
-    </tr>`;
+    <div class="carrito-item">
+      <div>${p.producto}</div>
+      <div>${p.talla}</div>
+      <div>${p.cantidad}</div>
+      <div>S/${t.toFixed(2)}</div>
+    </div>`;
   });
 
-  html+=`</table>
+  html+=`
+  <button class="btn-descuento" onclick="descuento()">DESCUENTO</button>
+  <div class="carrito-total">TOTAL: S/${total.toFixed(2)}</div>
+  </div>`;
 
-  <input id="desc" placeholder="Descuento">
-  <button onclick="aplicarDescuento()">Aplicar</button>
-
-  <h3>TOTAL: S/ <span id="totalFinal">${total}</span></h3>
-
-  <button onclick="cerrarCarrito()">⬅ Volver</button>`;
-
-  carritoVista.innerHTML=html;
+  document.getElementById("carrito").innerHTML=html;
 }
 
-function cerrarCarrito(){
-  carritoVista.style.display="none";
-  productos.style.display="grid";
-}
-
-function sumar(i){carrito[i].cantidad++;verCarrito();}
-function restar(i){carrito[i].cantidad--;if(carrito[i].cantidad<=0)carrito.splice(i,1);verCarrito();}
-
-function aplicarDescuento(){
-  let t=parseFloat(totalFinal.innerText);
-  let d=parseFloat(desc.value)||0;
-  totalFinal.innerText=(t-d);
+function descuento(){
+  carrito=carrito.map(p=>{
+    p.unidad*=0.9;
+    return p;
+  });
+  renderCarrito();
 }
 
 </script>
