@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A&T KAMIARA</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Librería para el PDF -->
+    <!-- Librerías para PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
-
 <body>
+
 <div id="toast-container"></div>
 
 <!-- LOGIN -->
@@ -28,39 +28,38 @@
 <div id="app" style="display:none;">
     <div id="userInfo"></div>
 
-    <!-- HEADER CON 3 ESPACIOS -->
+    <!-- HEADER CON ESPACIO PARA 3 BOTONES -->
     <div class="top-buttons">
       <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
       <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
-      <button class="btn-carrito" onclick="verCarrito()">🛒 Carrito (<span id="cart-count">0</span>)</button>
+      <button class="btn-carrito-top" onclick="verCarrito()">🛒 Carrito (<span id="cart-count">0</span>)</button>
     </div>
 
+    <!-- CONTENIDO PRINCIPAL -->
     <div id="main-content">
         <div id="portada">
           <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
           <div class="titulo">CONTROL DE INVENTARIO</div>
           <div class="sub">--------------------------------------------------</div>
         </div>
-
         <div id="menu" class="grid-menu">
           <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
           <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
           <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
           <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
         </div>
-
         <div id="productos"></div>
     </div>
 
-    <!-- SECCIÓN CARRITO -->
-    <div id="carrito-view" style="display:none; padding:10px;">
-        <h2>Tu Carrito</h2>
+    <!-- VISTA DEL CARRITO -->
+    <div id="carrito-view" style="display:none; padding:15px;">
+        <h2 style="text-align:left;">🛒 Mi Carrito</h2>
         <div id="lista-carrito"></div>
         <div id="resumen-pago"></div>
     </div>
 
-    <!-- SECCIÓN VOUCHER -->
-    <div id="voucher-view" style="display:none; padding:20px;"></div>
+    <!-- VISTA DEL VOUCHER -->
+    <div id="voucher-view" style="display:none; padding:15px;"></div>
 
     <div id="panel">
       <h2>Panel Admin</h2>
