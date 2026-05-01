@@ -1,199 +1,156 @@
-const usuariosSistema = { luis:"123", katy:"123", katherine:"123", richard:"123", dante:"admin123" };
-let inventario = [];
-let carrito = [];
+const users = { luis:"123", katy:"123", katherine:"123", richard:"123", dante:"admin123" };
+const admins = ["dante"];
+let db = [], cart = [];
 
-// Carga inicial y Login
-window.onload = () => {
-    if(localStorage.getItem("usuario")) {
+function login() {
+    const user = document.getElementById("u").value.toLowerCase();
+    const pass = document.getElementById("p").value;
+    if(users[user] === pass) {
+        localStorage.setItem("user", user);
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-        cargarDatos();
-    }
-};
-
-function guardarUsuario() {
-    const u = document.getElementById("inputUsuario").value.toLowerCase();
-    const p = document.getElementById("inputPassword").value;
-    if(usuariosSistema[u] === p) {
-        localStorage.setItem("usuario", u);
-        location.reload();
-    } else { document.getElementById("errorLogin").innerText = "Credenciales incorrectas"; }
+        if(admins.includes(user)) document.getElementById("adminBtn").style.display = "block";
+        init();
+    } else { document.getElementById("err").innerText = "Error de acceso"; }
 }
 
-async function cargarDatos() {
-    const url = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
-    const r = await fetch(url);
-    const d = await r.json();
-    inventario = d.map(p => {
-        let o = {};
-        Object.keys(p).forEach(k => o[k.toLowerCase().trim()] = p[k]);
+async function init() {
+    const res = await fetch("https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO");
+    const data = await res.json();
+    db = data.map(p => {
+        let n = {};
+        Object.keys(p).forEach(k => n[k.toLowerCase().trim()] = p[k]);
         return {
-            id: o.id, producto: o.producto, categoria: (o.categoria||"").toUpperCase(),
-            talla: o.talla, color: o.color, stock: parseInt(o.stock)||0,
-            pUnitario: parseFloat(o["p.unidad"]), pDocena: parseFloat(o["p.docena"]), imagen: o.imagen
+            id: n.id, nombre: n.producto, cat: (n.categoria||"").toUpperCase(),
+            talla: n.talla, color: n.color, stock: parseInt(n.stock)||0,
+            p1: parseFloat(n["p.unidad"]), p12: parseFloat(n["p.docena"]), img: n.imagen
         };
     });
-    mostrarMenu();
+    renderCats();
 }
 
-function mostrarMenu() {
+function renderCats() {
     const cats = ["INVIERNO", "VERANO", "TECNOLOGIA", "NAVIDEÑO"];
-    let html = "";
-    cats.forEach(c => {
-        html += `<div style="background:#111; border-radius:15px; text-align:center; padding-bottom:10px;" onclick="verCategoria('${c}')">
-                    <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK" style="width:100%; height:100px; object-fit:cover; border-radius:15px 15px 0 0;">
-                    <p>${c}</p>
-                 </div>`;
-    });
-    document.getElementById("menu").innerHTML = html;
+    const imgs = {
+        INVIERNO: "https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK",
+        VERANO: "https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx",
+        TECNOLOGIA: "https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq",
+        NAVIDEÑO: "https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"
+    };
+    let h = "";
+    cats.forEach(c => h += `<div class="menu-card" onclick="verCat('${c}')"><img src="${imgs[c]}"><p>${c}</p></div>`);
+    document.getElementById("menu-cats").innerHTML = h;
 }
 
-function verCategoria(cat) {
-    document.getElementById("menu").style.display = "none";
-    document.getElementById("productos-vista").style.display = "block";
-    const lista = inventario.filter(p => p.categoria === cat);
-    const unicos = [...new Map(lista.map(item => [item['id'], item])).values()];
-
-    let html = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
-    unicos.forEach(p => {
-        html += `<div style="background:#111; padding:10px; border-radius:10px; text-align:center;" onclick="verDetalle('${p.id}')">
-                    <img src="${p.imagen}" style="width:100%; height:120px; object-fit:cover;">
-                    <h4>${p.producto}</h4>
-                    <p style="color:lime">S/ ${p.pUnitario}</p>
-                 </div>`;
-    });
-    html += `</div><div class="footer-btns"><button class="btn-izq" onclick="location.reload()">Volver</button></div>`;
-    document.getElementById("productos-vista").innerHTML = html;
+function verCat(c) {
+    hideAll();
+    document.getElementById("v-productos").style.display = "block";
+    document.getElementById("cat-nombre").innerText = c;
+    const prods = db.filter(p => p.cat === c);
+    const unicos = [...new Map(prods.map(item => [item['id'], item])).values()];
+    let h = "";
+    unicos.forEach(p => h += `<div class="product-card" onclick="verDetalle('${p.id}')"><img src="${p.img}"><h4>${p.nombre}</h4><p style="color:lime">S/ ${p.p1}</p></div>`);
+    document.getElementById("lista-prods").innerHTML = h;
+    setNav("volverInicio", "Inicio", null, "");
 }
 
 function verDetalle(id) {
-    const variantes = inventario.filter(v => v.id == id);
-    const p = variantes[0];
-    const stockTotal = variantes.reduce((acc, v) => acc + v.stock, 0);
-
-    let html = `
-        <div style="text-align:center;">
-            <img src="${p.imagen}" style="width:100%; border-radius:15px; max-height:250px; object-fit:contain;">
-            <div style="background:#222; padding:5px; margin:10px 0; border-radius:5px;">STOCK TOTAL: ${stockTotal}</div>
-            <h2>${p.producto}</h2>
-            <table>
-                <tr><th>Escoger</th><th>Talla</th><th>Color</th><th>Stock</th></tr>`;
-    
-    variantes.forEach(v => {
-        html += `<tr>
-            <td><input type="checkbox" class="select-check" data-idx="${inventario.indexOf(v)}"></td>
-            <td>${v.talla}</td><td>${v.color}</td><td>${v.stock}</td>
-        </tr>`;
-    });
-
-    html += `</table></div>
-        <div class="footer-btns">
-            <button class="btn-izq" onclick="verCategoria('${p.categoria}')">Volver</button>
-            <button class="btn-der" onclick="agregarAlCarrito()">Añadir</button>
-        </div>`;
-    document.getElementById("productos-vista").innerHTML = html;
+    hideAll();
+    document.getElementById("v-detalle").style.display = "block";
+    const variants = db.filter(v => v.id == id);
+    const p = variants[0];
+    document.getElementById("detalle-content").innerHTML = `
+        <img src="${p.img}" style="width:100%; border-radius:20px; height:200px; object-fit:contain;">
+        <div style="background:var(--primary); color:black; padding:5px; text-align:center; font-weight:bold; margin-top:10px;">STOCK TOTAL: ${variants.reduce((a,b)=>a+b.stock,0)}</div>
+        <h2>${p.nombre}</h2>
+        <table>
+            <tr><th>Escoger</th><th>Talla</th><th>Color</th><th>Stock</th></tr>
+            ${variants.map(v => `<tr><td><input type="checkbox" class="sel-p" data-idx="${db.indexOf(v)}"></td><td>${v.talla}</td><td>${v.color}</td><td>${v.stock}</td></tr>`).join("")}
+        </table>`;
+    setNav("verCat", p.cat, "addCart", "Añadir");
 }
 
-function agregarAlCarrito() {
-    const checks = document.querySelectorAll(".select-check:checked");
-    if(checks.length === 0) return alert("Selecciona una opción");
-    
+function addCart() {
+    const checks = document.querySelectorAll(".sel-p:checked");
     checks.forEach(c => {
-        const item = inventario[c.dataset.idx];
-        const existe = carrito.find(x => x.idx === c.dataset.idx);
-        if(existe) { existe.cant++; } else { carrito.push({...item, cant: 1, idx: c.dataset.idx}); }
-        c.checked = false; // Quitar marca sin reiniciar vista
+        const item = db[c.dataset.idx];
+        const exist = cart.find(x => x.idx == c.dataset.idx);
+        if(exist) exist.cant++; else cart.push({...item, cant: 1, idx: c.dataset.idx});
+        c.checked = false;
     });
-    alert("¡Añadido!");
+    document.getElementById("count").innerText = cart.length;
+    const t = document.getElementById("toast"); t.style.display = "block"; setTimeout(()=>t.style.display="none", 2000);
 }
 
 function verCarrito() {
-    document.getElementById("main-content").style.display = "none";
-    document.getElementById("productos-vista").style.display = "none";
-    document.getElementById("carrito-vista").style.display = "block";
-
-    let subtotal = 0;
-    let html = `<h2>Mi Carrito</h2><table><tr><th>Prod/Talla</th><th>Cant</th><th>Sub</th><th>X</th></tr>`;
-    
-    carrito.forEach((p, i) => {
-        // Lógica de precio por docena
-        let precioAplicado = (p.cant >= 12) ? p.pDocena : p.pUnitario;
-        let sub = precioAplicado * p.cant;
-        subtotal += sub;
-
-        html += `<tr>
-            <td>${p.producto}<br><small>${p.talla} - ${p.color}</small></td>
-            <td>${p.cant}</td>
-            <td>S/ ${sub.toFixed(2)}</td>
-            <td><button style="background:red; color:white; border:none; border-radius:50%;" onclick="eliminarDelCarrito(${i})">×</button></td>
-        </tr>`;
+    hideAll();
+    document.getElementById("v-carrito").style.display = "block";
+    let h = "<table><tr><th>Producto</th><th>Cant</th><th>Sub</th></tr>", total = 0;
+    cart.forEach((p, i) => {
+        let precio = p.cant >= 12 ? p.p12 : p.p1;
+        let sub = precio * p.cant;
+        total += sub;
+        h += `<tr><td>${p.nombre}<br><small>${p.talla}-${p.color}</small></td><td>${p.cant}</td><td>S/ ${sub.toFixed(2)}</td></tr>`;
     });
+    document.getElementById("cart-list").innerHTML = h + "</table>";
+    document.getElementById("cart-total").innerHTML = `TOTAL: S/ ${total.toFixed(2)}`;
+    setNav("volverInicio", "Inicio", "irVoucher", "Pagar");
+}
 
-    html += `</table>
-        <h3 style="text-align:right;">Total: S/ ${subtotal.toFixed(2)}</h3>
-        <div class="footer-btns">
-            <button class="btn-izq" onclick="location.reload()">Cerrar</button>
-            <button class="btn-der" onclick="generarVoucher()">Pagar</button>
+function irVoucher() {
+    hideAll();
+    document.getElementById("v-voucher").style.display = "block";
+    const total = cart.reduce((a,b) => a + ((b.cant>=12?b.p12:b.p1)*b.cant), 0);
+    document.getElementById("voucher-legal").innerHTML = `
+        <div class="factura-box" id="ticket">
+            <h3 style="text-align:center;">A&T KAMIARA S.A.C.</h3>
+            <p style="text-align:center;">RUC: 20612345678<br>CALLE LAS EMPRESAS 123 - LIMA</p>
+            <hr>
+            ${cart.map(p => `<div style="display:flex; justify-content:space-between;"><span>${p.nombre} (x${p.cant})</span><span>S/ ${((p.cant>=12?p.p12:p.p1)*p.cant).toFixed(2)}</span></div>`).join("")}
+            <hr><div style="display:flex; justify-content:space-between; font-weight:bold;"><span>TOTAL:</span><span>S/ ${total.toFixed(2)}</span></div>
         </div>`;
-    document.getElementById("carrito-vista").innerHTML = html;
+    setNav("verCarrito", "Carrito", "procesarFinal", "Enviar");
 }
 
-function eliminarDelCarrito(i) {
-    carrito.splice(i, 1);
-    verCarrito();
-}
-
-function generarVoucher() {
-    document.getElementById("carrito-vista").style.display = "none";
-    document.getElementById("voucher-vista").style.display = "block";
+function procesarFinal() {
+    const t = cart.reduce((a,b) => a + ((b.cant>=12?b.p12:b.p1)*b.cant), 0);
+    const phone = document.getElementById("ws-phone").value;
     
-    const user = localStorage.getItem("usuario").toUpperCase();
-    const sub = carrito.reduce((a,b) => a + ((b.cant>=12?b.pDocena:b.pUnitario)*b.cant), 0);
-
-    let html = `
-        <div class="factura-box" id="ticket-pdf">
-            <h2 style="text-align:center;">A&T KAMIARA S.A.C.</h2>
-            <p style="text-align:center;">RUC: 20612345678<br>Av. Principal 123, Lima<br>Vendedor: ${user}</p>
-            <hr>
-            ${carrito.map(p => `
-                <div style="display:flex; justify-content:space-between;">
-                    <span>${p.producto} (${p.talla}) x${p.cant}</span>
-                    <span>S/ ${((p.cant>=12?p.pDocena:p.pUnitario)*p.cant).toFixed(2)}</span>
-                </div>`).join("")}
-            <hr>
-            <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                <span>TOTAL A PAGAR:</span><span>S/ ${sub.toFixed(2)}</span>
-            </div>
-            <p style="text-align:center; margin-top:10px;">¡Gracias por su compra!</p>
-        </div>
-        <div class="footer-btns">
-            <button class="btn-izq" onclick="verCarrito()">Volver</button>
-            <button class="btn-der" onclick="descargarPDF()">Descargar PDF</button>
-        </div>`;
-    document.getElementById("voucher-vista").innerHTML = html;
-}
-
-function descargarPDF() {
+    // Generar PDF
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: [80, 150] }); // Formato ticketera
-    
+    const doc = new jsPDF({ unit: 'mm', format: [80, 150] });
     doc.text("A&T KAMIARA S.A.C.", 10, 10);
-    doc.setFontSize(8);
-    doc.text("RUC: 20612345678", 10, 15);
-    doc.text("----------------------------------", 10, 20);
-    
-    let y = 25;
-    carrito.forEach(p => {
-        let precio = p.cant >= 12 ? p.pDocena : p.pUnitario;
-        doc.text(`${p.producto.substring(0,20)} x${p.cant}`, 10, y);
-        doc.text(`S/ ${(precio*p.cant).toFixed(2)}`, 60, y);
-        y += 5;
+    let y = 20;
+    cart.forEach(p => {
+        doc.text(`${p.nombre} x${p.cant} - S/ ${((p.cant>=12?p.p12:p.p1)*p.cant).toFixed(2)}`, 10, y);
+        y += 7;
     });
+    doc.text(`TOTAL: S/ ${t.toFixed(2)}`, 10, y + 5);
+    doc.save("Voucher.pdf");
 
-    doc.text("----------------------------------", 10, y + 5);
-    doc.text(`TOTAL: S/ ${carrito.reduce((a,b)=>a+((b.cant>=12?b.pDocena:b.pUnitario)*b.cant),0).toFixed(2)}`, 10, y + 10);
+    // Enviar WhatsApp
+    if(phone) {
+        let msg = `*A&T KAMIARA S.A.C.*\nResumen de compra:\n`;
+        cart.forEach(p => msg += `- ${p.nombre} (${p.talla}) x${p.cant}: S/ ${((p.cant>=12?p.p12:p.p1)*p.cant).toFixed(2)}\n`);
+        msg += `\n*TOTAL A PAGAR: S/ ${t.toFixed(2)}*`;
+        window.open(`https://api.whatsapp.com/send?phone=51${phone}&text=${encodeURIComponent(msg)}`, '_blank');
+    }
     
-    doc.save("Voucher_Kamiara.pdf");
-    alert("Venta finalizada y PDF generado");
+    alert("¡Venta finalizada!");
     location.reload();
 }
+
+function hideAll() {
+    ["v-inicio", "v-productos", "v-detalle", "v-carrito", "v-voucher"].forEach(v => document.getElementById(v).style.display = "none");
+    document.getElementById("controles").style.display = "grid";
+}
+
+function volverInicio() { hideAll(); document.getElementById("v-inicio").style.display = "block"; document.getElementById("controles").style.display = "none"; }
+
+function setNav(fnB, txtB, fnN, txtN) {
+    const b = document.getElementById("btn-back"), n = document.getElementById("btn-next");
+    b.onclick = () => window[fnB](); b.innerText = "← " + txtB;
+    if(fnN) { n.style.visibility = "visible"; n.onclick = () => window[fnN](); n.innerText = txtN; } else { n.style.visibility = "hidden"; }
+}
+
+function abrirAdmin() { window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE", "_blank"); }
