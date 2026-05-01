@@ -1,74 +1,84 @@
-/* --- BASE --- */
+/* --- CONFIGURACIÓN BASE PARA PC Y MÓVIL --- */
 body {
-  background: linear-gradient(135deg,#0b0b0b,#1a1a1a);
+  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
   color: white;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
+  display: flex;
+  justify-content: center; /* Centra la app en PC */
 }
 
-/* NOTIFICACIONES */
-#toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 350px; }
-.toast { background: #28a745; color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: slideDown 0.5s, fadeOut 0.5s 2.5s forwards; }
-.toast.error { background: #dc3545; }
+#app {
+  width: 100%;
+  max-width: 500px; /* Tamaño máximo tipo celular para que no se estire en PC */
+  min-height: 100vh;
+  background: #000;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+}
 
-@keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 0; opacity: 1; } }
+/* NOTIFICACIONES TIPO FALABELLA */
+#toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 80%; max-width: 300px; }
+.toast { background: #28a745; color: white; padding: 12px; border-radius: 8px; margin-bottom: 8px; text-align: center; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.4s, fadeOut 0.4s 2.5s forwards; }
+.toast.error { background: #dc3545; }
+@keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
 /* LOGIN */
-#login { display:flex; align-items:center; justify-content:center; height:100vh; }
-.login-box { background:#111; padding:20px; border-radius:20px; width:90%; max-width:320px; text-align:center; }
-.login-box input { width:100%; padding:12px; margin:6px 0; border:none; border-radius:10px; background:#222; color:white; box-sizing:border-box; }
-.login-box button { width:100%; padding:12px; background:red; color:white; border:none; border-radius:10px; font-weight:bold; }
+#login { display: flex; align-items: center; justify-content: center; height: 100vh; width: 100%; }
+.login-box { background: #111; padding: 30px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; border: 1px solid #333; }
+.login-box input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #333; border-radius: 10px; background: #222; color: white; box-sizing: border-box; }
+.login-box button { width: 100%; padding: 12px; background: #e60000; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-/* HEADER */
-#userInfo { text-align:center; margin-top:10px; font-weight:bold; }
-.top-buttons { display:flex; justify-content:center; gap:10px; margin:15px 10px; }
-.btn-salir { background:red; color:white; border:none; padding:8px 15px; border-radius:8px; }
-#btnVerCarrito { background:#28a745; color:white; border:none; padding:8px 15px; border-radius:8px; font-weight:bold; }
-.btn-admin { background:#007bff; color:white; border:none; padding:8px 15px; border-radius:8px; display:none; }
+/* HEADER Y BOTONES SUPERIORES */
+#userInfo { text-align: center; font-size: 12px; color: #aaa; margin-top: 10px; text-transform: uppercase; }
+.top-buttons { display: flex; justify-content: space-between; gap: 10px; padding: 10px 15px; }
+.top-buttons button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; }
+.btn-salir { background: #333; color: white; }
+.btn-carrito { background: #28a745; color: white; }
+.btn-admin { background: #007bff; color: white; }
 
 /* PORTADA */
-#portada img { width: 100%; height: 100px; object-fit: cover; }
-.titulo { text-align: center; font-size: 20px; margin-top: 10px; }
-.sub { text-align: center; color: gray; font-size: 12px; margin-bottom: 10px; }
+#portada { text-align: center; }
+#portada img { width: 100%; height: auto; max-height: 140px; object-fit: contain; background: #000; }
+.titulo { font-weight: bold; font-size: 18px; margin-top: 5px; color: #fff; }
+.sub { color: #444; margin-bottom: 15px; font-size: 10px; }
 
-/* --- GRID RESPONSIVO (CLAVE) --- */
-.grid-menu, #productos {
-  display: none;
-  grid-template-columns: repeat(2, 1fr); /* SIEMPRE 2 EN CELULAR */
-  gap: 10px;
-  padding: 10px;
+/* GRID DE PRODUCTOS (SIEMPRE 2 COLUMNAS) */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 12px;
+  padding: 15px;
 }
 
-@media (min-width: 768px) {
-  #app { max-width: 1000px; margin: auto; }
-  .grid-menu, #productos { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-  #portada img { height: 180px; }
-}
+.menu-card, .card { background: #111; border-radius: 15px; overflow: hidden; text-align: center; cursor: pointer; border: 1px solid #222; transition: 0.2s; }
+.menu-card:active, .card:active { transform: scale(0.95); }
+.menu-card img, .card img { width: 100%; height: 130px; object-fit: cover; }
+.menu-card p, .card h3 { margin: 10px 0; font-size: 14px; font-weight: bold; }
 
-/* CARDS */
-.menu-card, .card { background:#111; border-radius:15px; overflow:hidden; text-align:center; cursor:pointer; padding-bottom:10px; }
-.menu-card img, .card img { width:100%; height:120px; object-fit:cover; }
+/* DETALLE DE PRODUCTO */
+.detalle-container { grid-column: span 2; background: #111; padding: 15px; border-radius: 20px; }
+.fila-opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+select { background: #222; color: white; border: 1px solid #444; padding: 8px; border-radius: 8px; width: 100%; }
+.btn-add { background: #28a745; color: white; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; border: none; margin-bottom: 15px; }
 
-/* DETALLES */
-.fila-opciones { display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#111; padding:12px; border-radius:10px; margin:10px; font-size:13px; }
-select { background:#222; color:white; border:1px solid #444; border-radius:5px; padding:5px; }
-table { width:100%; background:#111; border-radius:10px; border-collapse: collapse; margin-top:10px; }
-th, td { padding:8px; font-size:12px; border-bottom: 1px solid #222; }
+/* TABLA */
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+th { background: #222; padding: 8px; }
+td { padding: 8px; text-align: center; border-bottom: 1px solid #222; }
 
 /* CARRITO */
-.item-carrito { background:#1a1a1a; border-radius:10px; padding:10px; margin-bottom:10px; border-left:4px solid #28a745; }
-.info-principal { display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px; }
-.grid-carrito { display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:5px; align-items:center; font-size:12px; }
-.controles-cant { display:flex; gap:5px; background:#222; padding:3px; border-radius:5px; justify-content:center; }
-.btn-cant { background:#444; border:none; color:white; width:22px; border-radius:3px; }
-.resumen-total { margin-top:20px; border-top:1px solid #444; padding-top:15px; }
-.total-grande { font-size:20px; font-weight:bold; color:#00aaff; }
-#montoDescuento { width:60px; background:#222; color:white; border:1px solid #444; text-align:center; }
-.botones-carrito { display:flex; gap:10px; }
-
-/* BOTONES GENERALES */
-button { width:100%; padding:12px; border-radius:10px; border:none; cursor:pointer; margin-top:10px; font-size:14px; }
-.btn-full { grid-column: 1 / -1; background:#444; color:white; }
-#panel { display:none; padding:20px; }
+.item-carrito { background: #161616; padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #28a745; }
+.info-principal { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.grid-carrito { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: center; font-size: 12px; }
+.controles-cant { display: flex; align-items: center; gap: 8px; background: #222; padding: 4px 8px; border-radius: 5px; }
+.btn-cant { background: #444; color: white; border: none; width: 20px; border-radius: 3px; cursor: pointer; }
+.btn-eliminar { color: #ff4d4d; font-weight: bold; background: none; border: none; cursor: pointer; }
+.resumen-total { margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; }
+.total-grande { font-size: 22px; font-weight: bold; color: #00aaff; }
+.botones-carrito { display: flex; gap: 10px; margin-top: 15px; }
+.btn-back { background: #444; color: white; flex: 1; border-radius: 10px; padding: 12px; border: none; }
+.btn-pagar { background: #28a745; color: white; flex: 1; border-radius: 10px; padding: 12px; border: none; font-weight: bold; }
