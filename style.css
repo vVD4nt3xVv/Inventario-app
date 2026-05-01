@@ -1,51 +1,66 @@
-/* Base igual al original, añadimos/modificamos: */
-body { background: #0b0b0b; color: white; font-family: Arial; margin: auto; max-width: 480px; }
+body {
+  background: linear-gradient(135deg,#0b0b0b,#1a1a1a);
+  color: white;
+  font-family: Arial;
+  margin: auto;
+  max-width: 480px;
+  font-size: 15px;
+}
 
-/* HEADER - 3 BOTONES */
+/* HEADER: 3 COLUMNAS */
 .top-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; /* Espacio para 3 */
-    gap: 10px;
-    padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
 }
-.btn-salir { background: red; padding: 10px; border-radius: 8px; font-size: 12px; }
-.btn-admin { background: #007bff; padding: 10px; border-radius: 8px; font-size: 12px; }
-.btn-carrito { background: #90ee90; color: black; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+.btn-salir { background: red; padding: 10px; border-radius: 8px; font-size: 12px; border:none; color:white; }
+.btn-admin { background: #007bff; padding: 10px; border-radius: 8px; font-size: 12px; border:none; color:white; display:none; }
+.btn-carrito-top { background: #90ee90; color: black; padding: 10px; border-radius: 8px; font-size: 12px; border:none; font-weight:bold; }
 
-/* BOTONES PIE (DETALLE Y CARRITO) */
+/* BOTONES DE ACCIÓN (PIE DE PÁGINA) */
 .footer-btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
 }
-.btn-volver { background: red; grid-column: 1; }
-.btn-accion { background: #28a745; grid-column: 3; color: white; } /* Verde para añadir/pagar */
+.btn-rojo { background: red; color: white; border: none; border-radius: 10px; padding: 12px; grid-column: 1; }
+.btn-verde { background: #28a745; color: white; border: none; border-radius: 10px; padding: 12px; grid-column: 3; }
+.btn-celeste { background: #00ced1; color: white; border: none; border-radius: 5px; padding: 5px 10px; width: auto; cursor: pointer; }
 
 /* SELECTOR REDONDO */
-.check-add {
-    width: 20px;
-    height: 20px;
-    accent-color: #28a745;
-    cursor: pointer;
+.select-check {
+  width: 20px;
+  height: 20px;
+  accent-color: #28a745;
+  cursor: pointer;
 }
 
-/* MENSAJES TOAST */
-#toast-container {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
+/* TOAST (MENSAJES) */
+#toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; }
+.toast { padding: 12px 25px; border-radius: 8px; margin-bottom: 8px; font-weight: bold; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.success { background: #28a745; color: white; }
+.error { background: #ff4d4d; color: white; }
+
+/* VOUCHER / FACTURA */
+.factura-box {
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 10px;
+  font-family: 'Courier New', Courier, monospace;
 }
-.toast { padding: 10px 20px; border-radius: 5px; margin-bottom: 5px; font-weight: bold; }
-.toast-success { background: #28a745; color: white; }
-.toast-error { background: #dc3545; color: white; }
 
-/* RESUMEN Y DESCUENTO */
-.btn-descuento { background: #00ced1; color: white; padding: 5px; width: auto; }
-.fila-pago { display: flex; justify-content: space-between; padding: 5px 0; }
-.total-final { color: #00aaff; font-size: 1.2em; font-weight: bold; }
-
-/* VOUCHER ESTILO FACTURA */
-.factura { background: white; color: black; padding: 20px; border-radius: 10px; }
+/* Reutilización de tus estilos anteriores */
+#login { display:flex; align-items:center; justify-content:center; height:100vh; }
+.login-box { background:#111; padding:20px; border-radius:20px; width:90%; text-align:center; }
+.login-box input { width:100%; padding:12px; margin:6px 0; background:#222; color:white; border:none; border-radius:10px; }
+.grid-menu { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px; }
+.menu-card { background:#111; border-radius:15px; text-align:center; }
+.menu-card img { width:100%; height:120px; object-fit:cover; }
+#productos { display:none; grid-template-columns:repeat(2,1fr); gap:10px; padding:10px; }
+.card { background:#111; border-radius:15px; padding:10px; text-align:center; }
+.card img { width:100%; height:140px; object-fit:cover; border-radius:10px; }
+table { width:100%; margin-top:10px; background:#111; border-radius:10px; text-align:center; color:white; }
+th, td { padding:8px; font-size:13px; border-bottom: 1px solid #222; }
