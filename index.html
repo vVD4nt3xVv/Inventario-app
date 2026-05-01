@@ -63,14 +63,15 @@ body {
   margin:10px;
 }
 
-.btn-salir, .btn-admin {
-  padding:8px 18px;
+.btn-salir, .btn-admin, .btn-carrito {
+  padding:8px 14px;
   border-radius:8px;
   font-size:13px;
 }
 
 .btn-salir {background:red;}
 .btn-admin {background:#007bff;display:none;}
+.btn-carrito {background:#00c853;}
 
 /* PORTADA */
 #portada img {width:100%;height:200px;object-fit:cover;}
@@ -101,9 +102,7 @@ body {
   object-fit:cover;
 }
 
-.menu-card p {
-  font-size:16px;
-}
+.menu-card p {font-size:16px;}
 
 /* PRODUCTOS */
 #productos {
@@ -134,10 +133,7 @@ body {
 .card p {font-size:14px;}
 
 /* DETALLE */
-.detalle-img {
-  width:100%;
-  border-radius:15px;
-}
+.detalle-img {width:100%;border-radius:15px;}
 
 /* FILA */
 .fila-opciones {
@@ -181,14 +177,14 @@ th,td {padding:8px;font-size:14px;}
 
 /* BOTONES */
 button {
-  width:100%;
-  margin-top:10px;
-  padding:12px;
+  width:auto;
+  padding:10px;
   border:none;
   border-radius:10px;
   background:red;
   color:white;
-  font-size:15px;
+  font-size:14px;
+  margin-top:10px;
 }
 
 h2 {text-align:center;}
@@ -199,7 +195,6 @@ h2 {text-align:center;}
 
 <body>
 
-<!-- LOGIN -->
 <div id="login">
   <div class="login-box">
     <h3>Bienvenido</h3>
@@ -210,20 +205,20 @@ h2 {text-align:center;}
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
 <div id="userInfo"></div>
 
 <div class="top-buttons">
   <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+  <button class="btn-carrito" onclick="verCarrito()">🛒</button>
   <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
 </div>
 
 <div id="portada">
   <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
   <div class="titulo">CONTROL DE INVENTARIO</div>
-  <div class="sub">-----------------------------------------------------------------------------------</div>
+  <div class="sub">------------------------------------------</div>
 </div>
 
 <div id="menu" class="grid-menu">
@@ -378,9 +373,10 @@ function verProducto(id){
 
       <table id="tablaDetalle"></table>
 
-      <button onclick="agregarCarrito('${id}')">🛒 Agregar al carrito</button>
-      <button onclick="verCarrito()">🧾 Ver carrito</button>
-      <button onclick="volverLista('${p.categoria}')">⬅ Volver</button>
+      <div style="display:flex; gap:10px;">
+        <button onclick="volverLista('${p.categoria}')">⬅ Volver</button>
+        <button style="background:#007bff;" onclick="agregarCarrito('${id}')">🛒 Agregar</button>
+      </div>
     </div>
   `;
 
@@ -399,17 +395,21 @@ function cambiarTalla(id){
   document.getElementById("stockTalla").innerText=total;
 
   let filas=`<tr>
-      <th>TALLA</th><th>COLOR</th><th>STOCK</th><th>P.UNIDAD</th><th>P.DOCENA</th>
-    </tr>`;
+    <th></th>
+    <th>TALLA</th>
+    <th>COLOR</th>
+    <th>STOCK</th>
+    <th>P.UNIDAD</th>
+  </tr>`;
 
-  filtrados.forEach(v=>{
+  filtrados.forEach((v,i)=>{
     filas+=`
       <tr>
+        <td><input type="radio" name="prodSelect" value="${i}"></td>
         <td>${v.talla}</td>
         <td>${v.color}</td>
         <td>${v.stock}</td>
         <td>S/ ${v.unidad}</td>
-        <td>S/ ${v.docena}</td>
       </tr>`;
   });
 
@@ -418,11 +418,21 @@ function cambiarTalla(id){
 
 // CARRITO
 function agregarCarrito(id){
+
+  const radios=document.getElementsByName("prodSelect");
+  let index=-1;
+
+  radios.forEach((r,i)=>{ if(r.checked) index=i; });
+
+  if(index===-1){ alert("Selecciona producto"); return; }
+
   const talla=document.getElementById("tallaSelect").value;
 
-  if(talla==="TODAS"){ alert("Selecciona talla"); return; }
+  let filtrados = talla==="TODAS"
+    ? inventario.filter(p=>p.id==id)
+    : inventario.filter(p=>p.id==id && p.talla==talla);
 
-  const item=inventario.find(p=>p.id==id && p.talla==talla);
+  const item=filtrados[index];
 
   if(!item || item.stock<=0){ alert("Sin stock"); return; }
 
@@ -435,7 +445,7 @@ function agregarCarrito(id){
     cantidad:1
   });
 
-  alert("Agregado al carrito");
+  alert("Agregado");
 }
 
 function verCarrito(){
@@ -467,9 +477,8 @@ function verCarrito(){
 }
 
 function finalizarVenta(){
-
   carrito.forEach(item=>{
-    const prod=inventario.find(p=>p.id==item.id && p.talla==item.talla);
+    const prod=inventario.find(p=>p.id==item.id && p.talla==item.talla && p.color==item.color);
     if(prod){
       prod.stock-=item.cantidad;
       if(prod.stock<0) prod.stock=0;
