@@ -39,6 +39,7 @@ body {
   margin:6px 0;
   border:none;
   border-radius:10px;
+  font-size:14px;
 }
 
 .login-box input {background:#222;color:white;}
@@ -47,8 +48,14 @@ body {
 #errorLogin {color:#ff4d4d;}
 
 /* HEADER */
-#userInfo {text-align:center;margin-top:10px;font-weight:bold;}
+#userInfo {
+  text-align:center;
+  margin-top:10px;
+  font-weight:bold;
+  font-size:16px;
+}
 
+/* BOTONES */
 .top-buttons {
   display:flex;
   justify-content:space-between;
@@ -56,12 +63,13 @@ body {
 }
 
 .btn-salir {background:red;}
-.btn-carrito {background:#00c853;}
 .btn-admin {background:#007bff;display:none;}
+.btn-carrito {background:#00c853;}
 
 .top-buttons button {
-  padding:8px 12px;
+  padding:8px 18px;
   border-radius:8px;
+  font-size:13px;
   border:none;
   color:white;
 }
@@ -85,14 +93,25 @@ body {
   overflow:hidden;
   text-align:center;
   cursor:pointer;
-  transition:0.2s;
 }
-.menu-card:hover {transform:scale(1.03);}
 
-.menu-card img {width:100%;height:120px;object-fit:cover;}
+.menu-card img {
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+
+.menu-card p {
+  font-size:16px;
+}
 
 /* PRODUCTOS */
-#productos {display:none; padding:10px;}
+#productos {
+  display:none;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  padding:10px;
+}
 
 .card {
   background:#111;
@@ -100,43 +119,99 @@ body {
   padding:10px;
   text-align:center;
   cursor:pointer;
-  transition:0.2s;
 }
-.card:hover {transform:scale(1.03);}
 
-.card img {width:100%;height:140px;object-fit:cover;border-radius:10px;}
+.card img {
+  width:100%;
+  height:140px;
+  object-fit:cover;
+  border-radius:10px;
+}
 
-.detalle-img {width:100%;border-radius:15px;}
+.card h3 {font-size:16px;}
+.card p {font-size:14px;}
+
+/* DETALLE */
+.detalle-img {
+  width:100%;
+  border-radius:15px;
+}
 
 /* FILA */
 .fila-opciones {
   display:flex;
   justify-content:space-between;
+  align-items:center;
   background:#111;
-  padding:10px;
+  padding:12px;
   border-radius:10px;
   margin-top:10px;
+  gap:10px;
+  text-align:center;
+  font-size:14px;
 }
 
-.stock {color:#00ff88;}
-.total {color:#00aaff;}
+.fila-opciones div {
+  flex:1;
+}
 
+/* COLORES */
+.stock {
+  color:#00ff88;
+  font-weight:bold;
+  margin-left:5px;
+  font-size:15px;
+}
+
+.total {
+  color:#00aaff;
+  font-weight:bold;
+  margin-left:5px;
+  font-size:15px;
+}
+
+/* SELECT */
+select {
+  background:#222;
+  color:white;
+  border:none;
+  border-radius:8px;
+  padding:6px;
+  margin-left:5px;
+  font-size:14px;
+}
+
+/* TABLA */
 table {
   width:100%;
   margin-top:10px;
   background:#111;
   border-radius:10px;
+  text-align:center;
 }
 
-th,td {padding:8px;text-align:center;font-size:14px;}
+th,td {
+  padding:8px;
+  font-size:14px;
+}
 
+/* BOTONES */
 button {
-  padding:10px;
+  width:100%;
+  margin-top:10px;
+  padding:12px;
   border:none;
   border-radius:10px;
-  margin-top:10px;
+  background:red;
   color:white;
+  font-size:15px;
 }
+
+h2 {
+  text-align:center;
+}
+
+#panel {display:none;padding:20px;}
 
 /* TOAST */
 #toast {
@@ -152,10 +227,6 @@ button {
   z-index:999;
 }
 #toast.show {opacity:1;}
-
-h2{text-align:center;}
-
-#panel {display:none;padding:20px;}
 </style>
 </head>
 
@@ -186,7 +257,7 @@ h2{text-align:center;}
 <div id="portada">
   <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
   <div class="titulo">CONTROL DE INVENTARIO</div>
-  <div class="sub">------------------------------------------</div>
+  <div class="sub">-----------------------------------------------------------------------------------</div>
 </div>
 
 <div id="menu" class="grid-menu">
@@ -211,11 +282,19 @@ h2{text-align:center;}
 
 <script>
 
+// 🔹 NUEVO
+let carrito=[];
+let detalleActual=[];
+
 // USUARIOS
-const usuariosSistema={
-  luis:"123",katy:"123",katherine:"123",richard:"123",dante:"admin123"
+const usuariosSistema = {
+  luis:"123",
+  katy:"123",
+  katherine:"123",
+  richard:"123",
+  dante:"admin123"
 };
-const admins=["dante"];
+const admins = ["dante"];
 
 // LOGIN
 function guardarUsuario(){
@@ -234,6 +313,7 @@ function cerrarSesion(){
   location.reload();
 }
 
+// UI
 window.onload=()=>{
   const user=localStorage.getItem("usuario");
 
@@ -257,7 +337,6 @@ function mostrarToast(msg){
 // INVENTARIO
 const urlInv="https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
 let inventario=[];
-let carrito=[];
 
 fetch(urlInv)
 .then(r=>r.json())
@@ -273,8 +352,8 @@ fetch(urlInv)
       talla:o.talla,
       color:o.color,
       stock:parseInt(o.stock)||0,
-      unidad:parseFloat(o["p.unidad"])||0,
-      docena:parseFloat(o["p.docena"])||0,
+      unidad:o["p.unidad"],
+      docena:o["p.docena"],
       imagen:o.imagen
     };
   });
@@ -282,24 +361,17 @@ fetch(urlInv)
 
 // MENU
 function abrir(cat){
-  if(inventario.length===0){mostrarToast("Cargando...");return;}
-
   menu.style.display="none";
-  productos.style.display="block";
+  productos.style.display="grid";
 
   const filtrados=inventario.filter(p=>p.categoria===cat && p.stock>0);
 
-  let html="";
-  filtrados.forEach(p=>{
-    html+=`
-    <div class="card" onclick="verProducto('${p.id}')">
-      <img src="${p.imagen}">
-      <h3>${p.producto}</h3>
-      <p style="color:lime;">S/ ${p.unidad}</p>
-    </div>`;
-  });
+  const unicos={};
+  filtrados.forEach(p=>{ if(!unicos[p.id]) unicos[p.id]=p; });
 
-  productos.innerHTML=html+`<button onclick="inicio()">⬅ Volver</button>`;
+  render(Object.values(unicos));
+
+  productos.innerHTML+=`<button onclick="inicio()">⬅ Volver</button>`;
 }
 
 function inicio(){
@@ -308,53 +380,128 @@ function inicio(){
   panel.style.display="none";
 }
 
+// LISTA
+function render(lista){
+  let html="";
+  lista.forEach(p=>{
+    html+=`
+    <div class="card" onclick="verProducto('${p.id}')">
+      <img src="${p.imagen}">
+      <h3>${p.producto}</h3>
+      <p style="color:lime;">S/ ${p.unidad}</p>
+    </div>`;
+  });
+  productos.innerHTML=html;
+}
+
 // DETALLE
 function verProducto(id){
 
   const variantes=inventario.filter(p=>p.id==id);
   const p=variantes[0];
 
-  let html=`
-    <img class="detalle-img" src="${p.imagen}">
-    <h2>${p.producto}</h2>
+  const tallas=[...new Set(variantes.map(v=>v.talla))];
+  const stockTotal=variantes.reduce((a,b)=>a+b.stock,0);
 
-    <table>
-    <tr><th></th><th>Talla</th><th>Color</th><th>Stock</th></tr>`;
+  productos.innerHTML=`
+    <div>
+      <img class="detalle-img" src="${p.imagen}">
+      <h2>${p.producto}</h2>
 
-  variantes.forEach((v,i)=>{
-    html+=`
-    <tr>
-      <td><input type="radio" name="prodSelect" value="${i}"></td>
-      <td>${v.talla}</td>
-      <td>${v.color}</td>
-      <td>${v.stock}</td>
-    </tr>`;
-  });
+      <div class="fila-opciones">
 
-  html+=`</table>
+        <div>
+          🧵 TALLAS
+          <select id="tallaSelect" onchange="cambiarTalla('${id}')">
+            ${tallas.map(t=>`<option value="${t}">${t}</option>`).join("")}
+            <option value="TODAS">TODAS</option>
+          </select>
+        </div>
 
-  <div style="display:flex;justify-content:space-between;">
-    <button onclick="inicio()">⬅ Volver</button>
-    <button style="background:#007bff;" onclick="agregarCarrito('${id}')">🛒 Agregar</button>
-  </div>`;
+        <div>
+          📦 STOCK
+          <span class="stock" id="stockTalla">0</span>
+        </div>
 
-  productos.innerHTML=html;
+        <div>
+          📊 TOTAL
+          <span class="total">${stockTotal}</span>
+        </div>
+
+      </div>
+
+      <table id="tablaDetalle"></table>
+
+      <div style="display:flex;justify-content:space-between;">
+        <button onclick="volverLista('${p.categoria}')">⬅ Volver</button>
+        <button style="background:#007bff;" onclick="agregarCarrito('${id}')">🛒 Agregar</button>
+      </div>
+    </div>
+  `;
+
+  cambiarTalla(id);
 }
 
-// CARRITO
-function agregarCarrito(id){
+// FILTRO
+function cambiarTalla(id){
+  const talla=document.getElementById("tallaSelect").value;
+
+  let filtrados;
+
+  if(talla==="TODAS"){
+    filtrados=inventario.filter(p=>p.id==id);
+  } else {
+    filtrados=inventario.filter(p=>p.id==id && p.talla==talla);
+  }
+
+  detalleActual = filtrados;
+
+  const total=filtrados.reduce((a,b)=>a+b.stock,0);
+  document.getElementById("stockTalla").innerText=total;
+
+  let filas=`
+    <tr>
+      <th></th>
+      <th>TALLA</th>
+      <th>COLOR</th>
+      <th>STOCK</th>
+      <th>P.UNIDAD</th>
+      <th>P.DOCENA</th>
+    </tr>
+  `;
+
+  filtrados.forEach((v,i)=>{
+    filas+=`
+      <tr>
+        <td><input type="radio" name="prodSelect" value="${i}"></td>
+        <td>${v.talla}</td>
+        <td>${v.color}</td>
+        <td>${v.stock}</td>
+        <td>S/ ${v.unidad}</td>
+        <td>S/ ${v.docena}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("tablaDetalle").innerHTML=filas;
+}
+
+// AGREGAR CARRITO
+function agregarCarrito(){
 
   const radios=document.getElementsByName("prodSelect");
   let index=-1;
 
-  radios.forEach((r,i)=>{if(r.checked) index=i;});
+  radios.forEach((r,i)=>{
+    if(r.checked) index=i;
+  });
 
   if(index===-1){
     mostrarToast("Selecciona producto");
     return;
   }
 
-  const item=inventario.filter(p=>p.id==id)[index];
+  const item = detalleActual[index];
 
   if(item.stock<=0){
     mostrarToast("Sin stock");
@@ -366,6 +513,7 @@ function agregarCarrito(id){
   mostrarToast(item.producto+" agregado");
 }
 
+// VER CARRITO
 function verCarrito(){
 
   if(carrito.length===0){
@@ -384,22 +532,28 @@ function verCarrito(){
     </tr>`;
   });
 
-  html+="</table>";
+  html+="</table><button onclick='inicio()'>⬅ Volver</button>";
 
   productos.innerHTML=html;
 }
 
+// ELIMINAR
 function eliminarItem(i){
-  const n=carrito[i].producto;
+  const nombre=carrito[i].producto;
   carrito.splice(i,1);
 
   if(carrito.length===0){
-    mostrarToast("Tu carrito se vació");
+    mostrarToast("Carrito vacío");
     inicio();
   } else {
-    mostrarToast(n+" eliminado");
+    mostrarToast(nombre+" eliminado");
     verCarrito();
   }
+}
+
+// VOLVER
+function volverLista(cat){
+  abrir(cat);
 }
 
 // PANEL
