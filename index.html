@@ -3,46 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A&T KAMIARA - Estructura</title>
-    <!-- Aquí conectamos el CSS -->
+    <title>A&T KAMIARA - Inventario</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="toast-container"></div>
 
-    <!-- Contenedor principal donde armaremos el carrito -->
-    <div id="seccion-carrito">
-        <h2>Tu Pedido</h2>
-
-        <div id="lista-productos">
-            <!-- Aquí irán los productos luego -->
-            <p style="color: #666;">Cargando productos...</p>
-        </div>
-
-        <div class="resumen-pago">
-            <div class="fila">
-                <span>Subtotal:</span>
-                <span id="subtotal">S/ 0.00</span>
-            </div>
-
-            <!-- EL CUADRO DE DESCUENTO (Solo diseño) -->
-            <div class="caja-descuento">
-                <span>Descuento (S/):</span>
-                <div class="grupo-input">
-                    <input type="number" id="input-descuento" placeholder="0.00">
-                    <button type="button">APLICAR</button>
-                </div>
-            </div>
-
-            <div class="fila total">
-                <span>TOTAL:</span>
-                <span id="total-final">S/ 0.00</span>
-            </div>
-
-            <button class="btn-confirmar">CONFIRMAR PEDIDO</button>
+    <!-- LOGIN -->
+    <div id="login">
+        <div class="login-box">
+            <h2>A&T KAMIARA</h2>
+            <input id="usuario" placeholder="Usuario">
+            <input id="password" type="password" placeholder="Contraseña">
+            <button onclick="guardarUsuario()">ENTRAR</button>
+            <p id="errorLogin"></p>
         </div>
     </div>
 
-    <!-- Aquí conectamos el JS -->
+    <!-- APP -->
+    <div id="app" style="display:none;">
+        <div class="header-app">
+            <div id="userInfo"></div>
+            <button onclick="mostrarCarrito()">🛒 Carrito (<span id="cart-count">0</span>)</button>
+        </div>
+
+        <div id="portada">
+            <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG" alt="Portada">
+        </div>
+
+        <!-- Menú de Categorías -->
+        <div id="menu" class="grid-menu">
+            <div class="menu-card" onclick="abrir('INVIERNO')">
+                <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK">
+                <p>INVIERNO</p>
+            </div>
+            <!-- ... demás categorías ... -->
+        </div>
+
+        <div id="productos"></div>
+
+        <!-- SECCIÓN CARRITO -->
+        <div id="seccion-carrito" style="display:none;">
+            <h2>Tu Pedido</h2>
+            <div id="lista-carrito"></div>
+            
+            <div class="cart-resumen">
+                <div class="total-fila">
+                    <span>Subtotal:</span>
+                    <span id="subtotalCarrito">S/ 0.00</span>
+                </div>
+
+                <div class="caja-descuento">
+                    <span>Descuento (S/):</span>
+                    <div class="grupo-input">
+                        <input type="number" id="inputDescuento" placeholder="0.00">
+                        <button onclick="aplicarDescuento()">APLICAR</button>
+                    </div>
+                </div>
+
+                <div class="total-fila total-final">
+                    <span>TOTAL:</span>
+                    <span id="totalFinalCarrito">S/ 0.00</span>
+                </div>
+                <button class="btn-confirmar" onclick="confirmarPedido()">CONFIRMAR</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
