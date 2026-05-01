@@ -39,18 +39,23 @@ body {
   margin:6px 0;
   border:none;
   border-radius:10px;
+  font-size:14px;
 }
 
 .login-box input {background:#222;color:white;}
 .login-box button {background:red;color:white;}
 
-/* APP */
+#errorLogin {color:#ff4d4d;}
+
+/* HEADER */
 #userInfo {
   text-align:center;
   margin-top:10px;
   font-weight:bold;
+  font-size:16px;
 }
 
+/* BOTONES */
 .top-buttons {
   display:flex;
   justify-content:center;
@@ -58,8 +63,8 @@ body {
   margin:10px;
 }
 
-.btn-salir {background:red;padding:8px;border-radius:8px;}
-.btn-admin {background:#007bff;padding:8px;border-radius:8px;display:none;}
+.btn-salir {background:red;padding:8px 18px;border-radius:8px;}
+.btn-admin {background:#007bff;padding:8px 18px;border-radius:8px;display:none;}
 
 /* MENU */
 .grid-menu {
@@ -96,6 +101,7 @@ body {
   border-radius:15px;
   padding:10px;
   text-align:center;
+  cursor:pointer;
 }
 
 /* DETALLE */
@@ -104,21 +110,21 @@ body {
   border-radius:15px;
 }
 
-/* FILA */
 .fila-opciones {
   display:flex;
   justify-content:space-between;
+  align-items:center;
   background:#111;
   padding:12px;
   border-radius:10px;
   margin-top:10px;
+  gap:10px;
   font-size:14px;
 }
 
 .stock {color:#00ff88;}
 .total {color:#00aaff;}
 
-/* TABLA */
 table {
   width:100%;
   margin-top:10px;
@@ -127,18 +133,27 @@ table {
   text-align:center;
 }
 
-th,td {padding:8px;}
+th,td {padding:8px;font-size:14px;}
 
-/* CARRITO */
+/* BOTONES */
+button {
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:red;
+  color:white;
+  font-size:15px;
+}
+
+/* 🛒 CARRITO */
 #carrito {
   display:none;
-  flex-direction:column;
-  align-items:center;
-  padding:15px;
+  padding:10px;
 }
 
 .carrito-box {
-  width:100%;
   background:#111;
   border-radius:15px;
   padding:12px;
@@ -153,28 +168,23 @@ th,td {padding:8px;}
 
 .carrito-item {
   display:grid;
-  grid-template-columns:1fr 1fr 1fr 1fr;
+  grid-template-columns:2fr 1fr 1fr 1fr;
   text-align:center;
-  padding:8px;
-  border-bottom:1px solid #333;
   font-size:13px;
+  padding:6px;
+  border-bottom:1px solid #333;
 }
 
 .carrito-total {
   margin-top:10px;
   text-align:right;
-  color:#00aaff;
   font-weight:bold;
+  color:#00aaff;
 }
 
 .btn-descuento {
   background:green;
-  width:100%;
   margin-top:10px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  color:white;
 }
 </style>
 </head>
@@ -184,10 +194,11 @@ th,td {padding:8px;}
 <!-- LOGIN -->
 <div id="login">
   <div class="login-box">
-    <h3>LOGIN</h3>
+    <h3>Bienvenido</h3>
     <input id="usuario" placeholder="Usuario">
     <input id="password" type="password" placeholder="Contraseña">
     <button onclick="guardarUsuario()">Entrar</button>
+    <p id="errorLogin"></p>
   </div>
 </div>
 
@@ -202,13 +213,15 @@ th,td {padding:8px;}
 </div>
 
 <div id="menu" class="grid-menu">
-  <div class="menu-card" onclick="abrir('INVIERNO')">INVIERNO</div>
-  <div class="menu-card" onclick="abrir('VERANO')">VERANO</div>
+  <div class="menu-card" onclick="abrir('INVIERNO')">
+    <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK">
+    <p>INVIERNO</p>
+  </div>
 </div>
 
 <div id="productos"></div>
 
-<!-- CARRITO -->
+<!-- 🛒 CARRITO -->
 <div id="carrito"></div>
 
 </div>
@@ -216,40 +229,135 @@ th,td {padding:8px;}
 <script>
 
 /* LOGIN */
-const usuarios={luis:"123",dante:"admin123"};
+const usuariosSistema = {
+  luis:"123",
+  katy:"123",
+  katherine:"123",
+  richard:"123",
+  dante:"admin123"
+};
 const admins=["dante"];
 
 function guardarUsuario(){
-  const u=usuario.value.toLowerCase();
-  const p=password.value;
-  if(usuarios[u]!==p) return alert("error");
-  localStorage.setItem("u",u);
+  const user=usuario.value.toLowerCase();
+  const pass=password.value;
+
+  if(!usuariosSistema[user]) return errorLogin.innerText="Usuario no registrado";
+  if(usuariosSistema[user]!==pass) return errorLogin.innerText="Contraseña incorrecta";
+
+  localStorage.setItem("usuario",user);
   location.reload();
 }
 
 function cerrarSesion(){
-  localStorage.removeItem("u");
+  localStorage.removeItem("usuario");
   location.reload();
 }
 
 window.onload=()=>{
-  const u=localStorage.getItem("u");
-  login.style.display=u?"none":"flex";
-  app.style.display=u?"block":"none";
-  if(u) userInfo.innerText="USUARIO: "+u;
+  const user=localStorage.getItem("usuario");
+
+  login.style.display=user?"none":"flex";
+  app.style.display=user?"block":"none";
+
+  if(user){
+    userInfo.innerHTML="USUARIO: "+user.toUpperCase();
+    if(admins.includes(user)) panelBtn.style.display="inline-block";
+  }
 };
 
 /* INVENTARIO */
+const urlInv="https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
 let inventario=[];
-fetch("https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO")
+
+fetch(urlInv)
 .then(r=>r.json())
-.then(d=>inventario=d);
+.then(d=>{
+  inventario=d.map(p=>{
+    let o={};
+    Object.keys(p).forEach(k=>o[k.toLowerCase().trim()]=p[k]);
 
-/* CARRITO */
-let carrito=[];
+    return {
+      id:o.id,
+      producto:o.producto,
+      categoria:(o.categoria||"").toUpperCase(),
+      talla:o.talla,
+      color:o.color,
+      stock:parseInt(o.stock)||0,
+      unidad:o["p.unidad"],
+      docena:o["p.docena"],
+      imagen:o.imagen
+    };
+  });
+});
 
-function agregarCarrito(p){
-  carrito.push({
+/* MENU */
+function abrir(cat){
+  menu.style.display="none";
+  productos.style.display="grid";
+
+  const filtrados=inventario.filter(p=>p.categoria===cat && p.stock>0);
+
+  const unicos={};
+  filtrados.forEach(p=>{ if(!unicos[p.id]) unicos[p.id]=p; });
+
+  render(Object.values(unicos));
+}
+
+/* LISTA */
+function render(lista){
+  let html="";
+  lista.forEach(p=>{
+    html+=`
+    <div class="card" onclick="verProducto('${p.id}')">
+      <h3>${p.producto}</h3>
+      <p style="color:lime;">S/ ${p.unidad}</p>
+    </div>`;
+  });
+  productos.innerHTML=html;
+}
+
+/* DETALLE */
+function verProducto(id){
+
+  const variantes=inventario.filter(p=>p.id==id);
+  const p=variantes[0];
+
+  const stockTotal=variantes.reduce((a,b)=>a+b.stock,0);
+
+  productos.innerHTML=`
+    <div>
+      <img class="detalle-img" src="${p.imagen}">
+      <h2>${p.producto}</h2>
+
+      <div class="fila-opciones">
+        <div>📦 STOCK <span class="stock">${stockTotal}</span></div>
+        <div>💰 S/ ${p.unidad}</div>
+      </div>
+
+      <button onclick="agregarCarrito('${p.id}')">➕ Agregar carrito</button>
+
+      <button onclick="inicio()">⬅ Volver</button>
+    </div>
+  `;
+}
+
+/* VOLVER */
+function inicio(){
+  menu.style.display="grid";
+  productos.style.display="none";
+  carrito.style.display="none";
+}
+
+/* 🛒 CARRITO */
+let carritoData=[];
+
+function agregarCarrito(id){
+
+  const p=inventario.find(x=>x.id==id);
+  if(!p) return;
+
+  carritoData.push({
     producto:p.producto,
     talla:p.talla,
     color:p.color,
@@ -257,33 +365,39 @@ function agregarCarrito(p){
     docena:parseFloat(p.docena),
     cantidad:1
   });
+
   renderCarrito();
 }
 
-function calcularPrecio(p){
+function calcular(p){
   if(p.cantidad<12) return p.unidad*p.cantidad;
+
   const d=Math.floor(p.cantidad/12);
   const r=p.cantidad%12;
+
   return (d*p.docena)+(r*p.unidad);
 }
 
 function renderCarrito(){
 
-  carrito.style.display="flex";
+  carrito.style.display="block";
 
   let total=0;
 
   let html=`
   <div class="carrito-box">
-    <div class="carrito-titulo">CARRITO</div>
+    <div class="carrito-titulo">🛒 CARRITO</div>
 
     <div class="carrito-item">
-      <div>Prod</div><div>Talla</div><div>Cant</div><div>Total</div>
+      <div>Producto</div>
+      <div>Talla</div>
+      <div>Cant</div>
+      <div>Total</div>
     </div>
   `;
 
-  carrito.forEach(p=>{
-    const t=calcularPrecio(p);
+  carritoData.forEach(p=>{
+    const t=calcular(p);
     total+=t;
 
     html+=`
@@ -296,15 +410,15 @@ function renderCarrito(){
   });
 
   html+=`
-  <button class="btn-descuento" onclick="descuento()">DESCUENTO</button>
-  <div class="carrito-total">TOTAL: S/${total.toFixed(2)}</div>
+    <button class="btn-descuento" onclick="descuento()">DESCUENTO</button>
+    <div class="carrito-total">TOTAL: S/${total.toFixed(2)}</div>
   </div>`;
 
-  document.getElementById("carrito").innerHTML=html;
+  carrito.innerHTML=html;
 }
 
 function descuento(){
-  carrito=carrito.map(p=>{
+  carritoData=carritoData.map(p=>{
     p.unidad*=0.9;
     return p;
   });
