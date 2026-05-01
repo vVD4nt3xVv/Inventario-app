@@ -8,7 +8,6 @@
 </head>
 <body>
 
-<!-- Notificaciones -->
 <div id="toast-container"></div>
 
 <!-- LOGIN -->
@@ -28,16 +27,17 @@
 
     <div class="top-buttons">
       <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-      <button id="btnVerCarrito" onclick="verCarrito()" style="background:#28a745; width:auto; padding:8px 15px; color:white; border:none; border-radius:8px;">🛒 Carrito (0)</button>
+      <button id="btnVerCarrito" onclick="verCarrito()">🛒 Carrito (0)</button>
       <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
     </div>
 
     <div id="portada">
       <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
       <div class="titulo">CONTROL DE INVENTARIO</div>
-      <div class="sub">-----------------------------------------------------------------------------------</div>
+      <div class="sub">---------------------------------------------------</div>
     </div>
 
+    <!-- Menú -->
     <div id="menu" class="grid-menu">
       <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
       <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
@@ -45,9 +45,10 @@
       <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
     </div>
 
-    <div id="productos"></div>
+    <!-- Lista de Productos -->
+    <div id="productos" class="grid-menu"></div>
 
-    <!-- CARRITO -->
+    <!-- Carrito de Compras -->
     <div id="carrito" style="display:none; padding:15px;">
         <h2>CARRITO</h2>
         <div id="lista-carrito"></div>
@@ -70,12 +71,12 @@
         </div>
     </div>
 
-    <!-- PANEL ADMIN -->
+    <!-- Panel de Administración -->
     <div id="panel">
       <h2>Panel Admin</h2>
       <button onclick="abrirFormulario()">➕ Agregar Producto</button>
       <button onclick="verVentas()">📊 Ver Ventas</button>
-      <button onclick="inicio()">⬅ Volver</button>
+      <button onclick="inicio()" class="btn-volver">⬅ Volver</button>
     </div>
 </div>
 
