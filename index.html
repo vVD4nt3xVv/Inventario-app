@@ -1,42 +1,48 @@
-<!-- SOLO ESTRUCTURA DEL CARRITO PARA PROBAR DISEÑO -->
-<div id="seccion-carrito" style="padding: 20px; background: #111; color: white; max-width: 400px; margin: auto; border-radius: 15px;">
-    <h2 style="border-bottom: 1px solid #333; padding-bottom: 10px;">Tu Pedido</h2>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A&T KAMIARA - Estructura</title>
+    <!-- Aquí conectamos el CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <!-- Ejemplo de producto en el carrito -->
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222;">
-        <div>
-            <div style="font-weight: bold;">Casaca Invierno</div>
-            <small style="color: #888;">Talla: M | Color: Negro</small>
-        </div>
-        <div style="font-weight: bold;">S/ 85.00</div>
-    </div>
+    <!-- Contenedor principal donde armaremos el carrito -->
+    <div id="seccion-carrito">
+        <h2>Tu Pedido</h2>
 
-    <!-- RESUMEN DE PAGOS -->
-    <div style="margin-top: 20px; background: #1a1a1a; padding: 15px; border-radius: 10px;">
-        
-        <!-- Subtotal -->
-        <div style="display: flex; justify-content: space-between; margin-bottom: 15px; color: #aaa;">
-            <span>Subtotal:</span>
-            <span>S/ 85.00</span>
+        <div id="lista-productos">
+            <!-- Aquí irán los productos luego -->
+            <p style="color: #666;">Cargando productos...</p>
         </div>
 
-        <!-- CUADRO DE DESCUENTO (Lo que pediste) -->
-        <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 10px; border-radius: 8px; border: 1px solid #444; margin-bottom: 15px;">
-            <span style="font-size: 14px; font-weight: bold;">Descuento (S/):</span>
-            <div style="display: flex;">
-                <input type="number" placeholder="0.00" style="width: 70px; background: #000; border: 1px solid #555; color: #00ff88; text-align: center; border-radius: 5px 0 0 5px; outline: none; padding: 5px;">
-                <button style="background: #444; color: white; border: none; padding: 5px 10px; border-radius: 0 5px 5px 0; cursor: pointer; font-size: 12px;">APLICAR</button>
+        <div class="resumen-pago">
+            <div class="fila">
+                <span>Subtotal:</span>
+                <span id="subtotal">S/ 0.00</span>
             </div>
-        </div>
 
-        <!-- Total Final -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #333; padding-top: 15px;">
-            <span style="font-weight: bold; font-size: 18px;">TOTAL A PAGAR:</span>
-            <span style="font-weight: bold; font-size: 20px; color: #00aaff;">S/ 85.00</span>
-        </div>
+            <!-- EL CUADRO DE DESCUENTO (Solo diseño) -->
+            <div class="caja-descuento">
+                <span>Descuento (S/):</span>
+                <div class="grupo-input">
+                    <input type="number" id="input-descuento" placeholder="0.00">
+                    <button type="button">APLICAR</button>
+                </div>
+            </div>
 
-        <button style="width: 100%; background: #28a745; color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer;">
-            CONFIRMAR PEDIDO
-        </button>
+            <div class="fila total">
+                <span>TOTAL:</span>
+                <span id="total-final">S/ 0.00</span>
+            </div>
+
+            <button class="btn-confirmar">CONFIRMAR PEDIDO</button>
+        </div>
     </div>
-</div>
+
+    <!-- Aquí conectamos el JS -->
+    <script src="app.js"></script>
+</body>
+</html>
