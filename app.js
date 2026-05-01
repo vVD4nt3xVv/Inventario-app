@@ -2,49 +2,65 @@ const usuariosSistema = { luis:"123", katy:"123", katherine:"123", richard:"123"
 const admins = ["dante"];
 let inventario = [], carrito = [], descuentoGlobal = 0;
 
-// NOTIFICACIONES
+// SISTEMA DE NOTIFICACIONES
 function showToast(msj, tipo = "success") {
     const container = document.getElementById("toast-container");
     const div = document.createElement("div");
     div.className = `toast ${tipo === "error" ? "error" : ""}`;
     div.innerText = msj;
     container.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
+    setTimeout(() => {
+        div.style.opacity = "0";
+        setTimeout(() => div.remove(), 500);
+    }, 2500);
 }
 
-// LOGIN
+// GESTIÓN DE SESIÓN
 function guardarUsuario(){
-    const user = document.getElementById("usuario").value.toLowerCase();
+    const user = document.getElementById("usuario").value.toLowerCase().trim();
     const pass = document.getElementById("password").value;
-    if(!usuariosSistema[user] || usuariosSistema[user] !== pass) return document.getElementById("errorLogin").innerText = "Error de acceso";
-    localStorage.setItem("usuario", user);
+    if(!usuariosSistema[user] || usuariosSistema[user] !== pass) {
+        document.getElementById("errorLogin").innerText = "Usuario o contraseña incorrectos";
+        return;
+    }
+    localStorage.setItem("at_user", user);
     location.reload();
 }
-function cerrarSesion(){ localStorage.removeItem("usuario"); location.reload(); }
+
+function cerrarSesion(){ localStorage.removeItem("at_user"); location.reload(); }
 
 window.onload = () => {
-    const user = localStorage.getItem("usuario");
+    const user = localStorage.getItem("at_user");
     if(user){
         document.getElementById("login").style.display = "none";
-        document.getElementById("app").style.display = "block";
-        document.getElementById("userInfo").innerHTML = `USUARIO: ${user.toUpperCase()}`;
+        document.getElementById("app").style.display = "flex";
+        document.getElementById("userInfo").innerHTML = `SESIÓN: ${user.toUpperCase()}`;
         if(admins.includes(user)) document.getElementById("panelBtn").style.display = "inline-block";
+        cargarInventario();
     }
 };
 
-// CARGA DE DATOS
-const urlInv = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
-fetch(urlInv).then(r => r.json()).then(d => {
-    inventario = d.map(p => {
-        let o = {};
-        Object.keys(p).forEach(k => o[k.toLowerCase().trim()] = p[k]);
-        return {
-            id: o.id, producto: o.producto, categoria: (o.categoria || "").toUpperCase(),
-            talla: o.talla, color: o.color, stock: parseInt(o.stock) || 0,
-            unidad: parseFloat(o["p.unidad"]) || 0, docena: parseFloat(o["p.docena"]) || 0, imagen: o.imagen
-        };
-    });
-});
+// CARGAR DATOS DESDE SHEETS
+function cargarInventario() {
+    const url = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
+    fetch(url).then(r => r.json()).then(data => {
+        inventario = data.map(p => {
+            let item = {};
+            Object.keys(p).forEach(key => item[key.toLowerCase().trim()] = p[key]);
+            return {
+                id: item.id,
+                producto: item.producto,
+                categoria: (item.categoria || "").toUpperCase(),
+                talla: item.talla,
+                color: item.color,
+                stock: parseInt(item.stock) || 0,
+                unidad: parseFloat(item["p.unidad"]) || 0,
+                docena: parseFloat(item["p.docena"]) || 0,
+                imagen: item.imagen
+            };
+        });
+    }).catch(() => showToast("Error al cargar inventario", "error"));
+}
 
 // NAVEGACIÓN
 function abrir(cat) {
@@ -54,7 +70,16 @@ function abrir(cat) {
     const filtrados = inventario.filter(p => p.categoria === cat && p.stock > 0);
     const unicos = {};
     filtrados.forEach(p => { if(!unicos[p.id]) unicos[p.id] = p; });
-    renderLista(Object.values(unicos));
+    
+    let html = "";
+    Object.values(unicos).forEach(p => {
+        html += `<div class="card" onclick="verProducto('${p.id}')">
+            <img src="${p.imagen}">
+            <h3>${p.producto}</h3>
+            <p style="color:#00ff88; margin-bottom:10px;">S/ ${p.unidad.toFixed(2)}</p>
+        </div>`;
+    });
+    document.getElementById("productos").innerHTML = html + `<button onclick="inicio()" style="grid-column: span 2; background:#333; color:white; border:none; padding:12px; border-radius:10px; margin-top:10px;">⬅ VOLVER</button>`;
 }
 
 function inicio() {
@@ -64,31 +89,27 @@ function inicio() {
     document.getElementById("panel").style.display = "none";
 }
 
-function renderLista(lista) {
-    let html = "";
-    lista.forEach(p => {
-        html += `<div class="card" onclick="verProducto('${p.id}')"><img src="${p.imagen}"><h3>${p.producto}</h3><p style="color:lime;">S/ ${p.unidad}</p></div>`;
-    });
-    document.getElementById("productos").innerHTML = html + `<button onclick="inicio()" class="btn-full">⬅ Volver al Menú</button>`;
-}
-
-// DETALLE PRODUCTO
+// DETALLE Y SELECCIÓN
 function verProducto(id) {
     const variantes = inventario.filter(v => v.id == id);
     const p = variantes[0];
     const tallas = [...new Set(variantes.map(v => v.talla))];
     
     document.getElementById("productos").innerHTML = `
-        <div style="grid-column: span 1 / -1; background:#111; border-radius:20px; padding:15px;">
-            <img style="width:100%; border-radius:15px; height:180px; object-fit:cover;" src="${p.imagen}">
-            <h2>${p.producto}</h2>
+        <div class="detalle-container">
+            <img src="${p.imagen}" style="width:100%; border-radius:15px; height:200px; object-fit:cover;">
+            <h2 style="margin:15px 0 5px 0;">${p.producto}</h2>
+            <p style="color:gray; font-size:12px; margin-bottom:15px;">Selecciona las opciones para añadir</p>
+            
             <div class="fila-opciones">
-                <div>🧵 TALLA <select id="selTalla" onchange="actualizarColores('${id}')">${tallas.map(t => `<option value="${t}">${t}</option>`).join("")}</select></div>
-                <div>🎨 COLOR <select id="selColor"></select></div>
+                <div><small>TALLA</small><select id="selTalla" onchange="actualizarColores('${id}')">${tallas.map(t => `<option value="${t}">${t}</option>`).join("")}</select></div>
+                <div><small>COLOR</small><select id="selColor"></select></div>
             </div>
-            <button onclick="addDesdeBoton('${id}')" style="background:#28a745; font-weight:bold; color:white;">🛒 AÑADIR AL CARRITO</button>
+
+            <button class="btn-add" onclick="addDesdeBoton('${id}')">AÑADIR AL CARRITO</button>
+            
             <table id="tablaDetalle"></table>
-            <button onclick="abrir('${p.categoria}')" class="btn-full" style="background:#333;">⬅ Volver a Lista</button>
+            <button onclick="abrir('${p.categoria}')" style="background:none; color:gray; border:none; width:100%; margin-top:20px;">⬅ Volver a la lista</button>
         </div>`;
     actualizarColores(id);
 }
@@ -96,33 +117,38 @@ function verProducto(id) {
 function actualizarColores(id) {
     const talla = document.getElementById("selTalla").value;
     const colores = inventario.filter(v => v.id == id && v.talla == talla);
-    document.getElementById("selColor").innerHTML = colores.map(c => `<option value="${c.color}">${c.color} (${c.stock})</option>`).join("");
+    document.getElementById("selColor").innerHTML = colores.map(c => `<option value="${c.color}">${c.color} (Stock: ${c.stock})</option>`).join("");
     
-    let filas = `<tr><th>COLOR</th><th>STOCK</th><th>UNID.</th><th>DOC.</th></tr>`;
-    colores.forEach(v => { filas += `<tr><td>${v.color}</td><td>${v.stock}</td><td>${v.unidad}</td><td>${v.docena}</td></tr>`; });
+    let filas = `<tr><th>COLOR</th><th>STOCK</th><th>P. UNID</th></tr>`;
+    colores.forEach(v => { filas += `<tr><td>${v.color}</td><td>${v.stock}</td><td>S/ ${v.unidad.toFixed(2)}</td></tr>`; });
     document.getElementById("tablaDetalle").innerHTML = filas;
 }
 
 function addDesdeBoton(id) {
     const talla = document.getElementById("selTalla").value;
     const color = document.getElementById("selColor").value;
-    agregarAlCarrito(id, talla, color);
-}
-
-// CARRITO
-function agregarAlCarrito(id, talla, color) {
     const item = inventario.find(p => p.id == id && p.talla == talla && p.color == color);
+    
+    if(!item || item.stock <= 0) return showToast("Sin stock disponible", "error");
+
     const existe = carrito.find(c => c.id == id && c.talla == talla && c.color == color);
-    if(existe) existe.cantidad++; else carrito.push({ ...item, cantidad: 1 });
-    showToast(`Añadido: ${item.producto}`);
+    if(existe) {
+        if(existe.cantidad >= item.stock) return showToast("Límite de stock alcanzado", "error");
+        existe.cantidad++;
+    } else {
+        carrito.push({ ...item, cantidad: 1 });
+    }
+    
+    showToast(`Se añadió: ${item.producto}`);
     actualizarContador();
 }
 
 function actualizarContador() {
-    const cant = carrito.reduce((a, b) => a + b.cantidad, 0);
-    document.getElementById("btnVerCarrito").innerText = `🛒 Carrito (${cant})`;
+    const total = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+    document.getElementById("btnVerCarrito").innerText = `🛒 Carrito (${total})`;
 }
 
+// CARRITO LÓGICA
 function verCarrito() {
     document.getElementById("menu").style.display = "none";
     document.getElementById("productos").style.display = "none";
@@ -131,31 +157,77 @@ function verCarrito() {
 }
 
 function renderCarrito() {
-    const lista = document.getElementById("lista-carrito");
-    let html = "", subtotal = 0;
+    const contenedor = document.getElementById("lista-carrito");
+    let html = "", total = 0;
+
     carrito.forEach((item, index) => {
         const precio = item.cantidad >= 12 ? item.docena : item.unidad;
-        const totalItem = precio * item.cantidad;
-        subtotal += totalItem;
+        const subtotal = precio * item.cantidad;
+        total += subtotal;
+
         html += `
         <div class="item-carrito">
-            <div class="info-principal"><span>${item.producto}</span> <button class="btn-eliminar" onclick="eliminarItem(${index})">X</button></div>
-            <div class="grid-carrito">
-                <span>T: ${item.talla}</span><span>C: ${item.color}</span>
-                <div class="controles-cant"><button class="btn-cant" onclick="cambiarCant(${index},-1)">-</button><span>${item.cantidad}</span><button class="btn-cant" onclick="cambiarCant(${index},1)">+</button></div>
-                <span style="text-align:right; font-weight:bold;">S/ ${totalItem.toFixed(2)}</span>
+            <div class="info-principal">
+                <span>${item.producto}</span>
+                <button class="btn-eliminar" onclick="eliminarItem(${index})">✕</button>
             </div>
-            <small style="color:${item.cantidad >= 12 ? '#00ff88' : 'gray'}">${item.cantidad >= 12 ? '✓ Precio Docena' : 'Precio Unitario'}</small>
+            <div class="grid-carrito">
+                <span>${item.talla} / ${item.color}</span>
+                <div class="controles-cant">
+                    <button class="btn-cant" onclick="cambiarCant(${index},-1)">-</button>
+                    <span>${item.cantidad}</span>
+                    <button class="btn-cant" onclick="cambiarCant(${index},1)">+</button>
+                </div>
+                <span style="font-weight:bold;">S/ ${subtotal.toFixed(2)}</span>
+            </div>
+            <div style="font-size:10px; color:${item.cantidad >= 12 ? '#00ff88' : '#777'}; margin-top:5px;">
+                ${item.cantidad >= 12 ? '★ Precio Docena Aplicado' : 'Precio Unitario'}
+            </div>
         </div>`;
     });
-    lista.innerHTML = html || "<p style='text-align:center'>Vacío</p>";
-    document.getElementById("precioTotalCarrito").innerText = `S/ ${(subtotal - descuentoGlobal).toFixed(2)}`;
+
+    contenedor.innerHTML = html || `<p style="text-align:center; color:gray; padding:40px;">El carrito está vacío</p>`;
+    document.getElementById("precioTotalCarrito").innerText = `S/ ${(total - descuentoGlobal).toFixed(2)}`;
 }
 
-function cambiarCant(i, v) { carrito[i].cantidad += v; if(carrito[i].cantidad <= 0) return eliminarItem(i); renderCarrito(); actualizarContador(); }
-function eliminarItem(i) { showToast(`Eliminado: ${carrito[i].producto}`, "error"); carrito.splice(i, 1); renderCarrito(); actualizarContador(); }
-function aplicarDescuento() { descuentoGlobal = parseFloat(document.getElementById("montoDescuento").value) || 0; renderCarrito(); }
-function abrirPanel() { document.getElementById("menu").style.display="none"; document.getElementById("panel").style.display="block"; }
+function cambiarCant(index, val) {
+    const item = carrito[index];
+    const original = inventario.find(p => p.id == item.id && p.talla == item.talla && p.color == item.color);
+    
+    if(val > 0 && item.cantidad >= original.stock) return showToast("No hay más stock", "error");
+    
+    item.cantidad += val;
+    if(item.cantidad <= 0) return eliminarItem(index);
+    renderCarrito();
+    actualizarContador();
+}
+
+function eliminarItem(index) {
+    showToast(`Eliminado: ${carrito[index].producto}`, "error");
+    carrito.splice(index, 1);
+    renderCarrito();
+    actualizarContador();
+}
+
+function aplicarDescuento() {
+    descuentoGlobal = parseFloat(document.getElementById("montoDescuento").value) || 0;
+    showToast("Descuento actualizado");
+    renderCarrito();
+}
+
+function pagar() {
+    if(carrito.length === 0) return showToast("Añade productos primero", "error");
+    alert("¡Pedido realizado con éxito!");
+    carrito = [];
+    descuentoGlobal = 0;
+    actualizarContador();
+    inicio();
+}
+
+// ADMIN
+function abrirPanel() {
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("panel").style.display = "block";
+}
 function abrirFormulario() { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform"); }
 function verVentas() { window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE"); }
-function pagar() { if(carrito.length === 0) return showToast("Carrito vacío", "error"); alert("Pedido registrado"); carrito = []; actualizarContador(); inicio(); }
