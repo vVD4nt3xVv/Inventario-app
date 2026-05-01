@@ -155,6 +155,18 @@ body {
   flex:1;
 }
 
+/* NUEVO */
+.fila-botones {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.fila-botones button {
+  width:auto;
+  flex:1;
+}
+
 /* COLORES */
 .stock {
   color:#00ff88;
@@ -179,6 +191,11 @@ select {
   padding:6px;
   margin-left:5px;
   font-size:14px;
+}
+
+/* RADIO VERDE */
+input[type="radio"] {
+  accent-color:#00ff88;
 }
 
 /* TABLA */
@@ -227,6 +244,7 @@ h2 {
   z-index:999;
 }
 #toast.show {opacity:1;}
+
 </style>
 </head>
 
@@ -282,9 +300,10 @@ h2 {
 
 <script>
 
-// 🔹 NUEVO
+// NUEVO
 let carrito=[];
 let detalleActual=[];
+let ultimaVista="menu";
 
 // USUARIOS
 const usuariosSistema = {
@@ -361,6 +380,7 @@ fetch(urlInv)
 
 // MENU
 function abrir(cat){
+  ultimaVista = cat;
   menu.style.display="none";
   productos.style.display="grid";
 
@@ -378,6 +398,7 @@ function inicio(){
   menu.style.display="grid";
   productos.style.display="none";
   panel.style.display="none";
+  ultimaVista="menu";
 }
 
 // LISTA
@@ -432,9 +453,9 @@ function verProducto(id){
 
       <table id="tablaDetalle"></table>
 
-      <div style="display:flex;justify-content:space-between;">
+      <div class="fila-botones">
         <button onclick="volverLista('${p.categoria}')">⬅ Volver</button>
-        <button style="background:#007bff;" onclick="agregarCarrito('${id}')">🛒 Agregar</button>
+        <button style="background:#007bff;" onclick="agregarCarrito()">🛒 Agregar</button>
       </div>
     </div>
   `;
@@ -465,6 +486,7 @@ function cambiarTalla(id){
       <th>TALLA</th>
       <th>COLOR</th>
       <th>STOCK</th>
+      <th>TIPO</th>
       <th>P.UNIDAD</th>
       <th>P.DOCENA</th>
     </tr>
@@ -477,6 +499,12 @@ function cambiarTalla(id){
         <td>${v.talla}</td>
         <td>${v.color}</td>
         <td>${v.stock}</td>
+        <td>
+          <select id="tipo${i}">
+            <option value="unidad">Unidad</option>
+            <option value="docena">Docena</option>
+          </select>
+        </td>
         <td>S/ ${v.unidad}</td>
         <td>S/ ${v.docena}</td>
       </tr>
@@ -486,7 +514,7 @@ function cambiarTalla(id){
   document.getElementById("tablaDetalle").innerHTML=filas;
 }
 
-// AGREGAR CARRITO
+// AGREGAR
 function agregarCarrito(){
 
   const radios=document.getElementsByName("prodSelect");
@@ -502,18 +530,21 @@ function agregarCarrito(){
   }
 
   const item = detalleActual[index];
+  const tipo = document.getElementById("tipo"+index).value;
 
-  if(item.stock<=0){
-    mostrarToast("Sin stock");
-    return;
-  }
+  const precio = tipo==="docena" ? item.docena : item.unidad;
 
-  carrito.push(item);
+  carrito.push({
+    ...item,
+    cantidad:1,
+    tipo,
+    precio
+  });
 
   mostrarToast(item.producto+" agregado");
 }
 
-// VER CARRITO
+// CARRITO
 function verCarrito(){
 
   if(carrito.length===0){
@@ -521,34 +552,78 @@ function verCarrito(){
     return;
   }
 
-  let html="<h2>🛒 Carrito</h2><table>";
+  let total=0;
+  let html="<h2 style='text-align:center;'>🛒 Carrito</h2><table>";
 
   carrito.forEach((c,i)=>{
+
+    let precioFinal=c.precio;
+
+    if(c.cantidad>=12 && c.tipo==="unidad"){
+      precioFinal = c.docena/12;
+    }
+
+    const subtotal=precioFinal*c.cantidad;
+    total+=subtotal;
+
     html+=`
     <tr>
-      <td>${c.producto}</td>
-      <td>${c.talla}</td>
+      <td>${c.producto}<br>${c.talla}</td>
+      <td>
+        <button onclick="restar(${i})">-</button>
+        ${c.cantidad}
+        <button onclick="sumar(${i})">+</button>
+      </td>
+      <td>S/ ${subtotal.toFixed(2)}</td>
       <td><button onclick="eliminarItem(${i})">❌</button></td>
     </tr>`;
   });
 
-  html+="</table><button onclick='inicio()'>⬅ Volver</button>";
+  html+=`</table>
+  <h3 style="text-align:center;">TOTAL: S/ ${total.toFixed(2)}</h3>
+
+  <div class="fila-botones">
+    <button onclick="volverAtras()">⬅ Volver</button>
+    <button style="background:#00c853;" onclick="comprar()">COMPRAR</button>
+  </div>`;
 
   productos.innerHTML=html;
 }
 
-// ELIMINAR
-function eliminarItem(i){
-  const nombre=carrito[i].producto;
-  carrito.splice(i,1);
+// + -
+function sumar(i){
+  carrito[i].cantidad++;
+  verCarrito();
+}
 
-  if(carrito.length===0){
-    mostrarToast("Carrito vacío");
-    inicio();
-  } else {
-    mostrarToast(nombre+" eliminado");
-    verCarrito();
+function restar(i){
+  carrito[i].cantidad--;
+  if(carrito[i].cantidad<=0){
+    carrito.splice(i,1);
   }
+  verCarrito();
+}
+
+// eliminar
+function eliminarItem(i){
+  carrito.splice(i,1);
+  verCarrito();
+}
+
+// volver
+function volverAtras(){
+  if(ultimaVista==="menu"){
+    inicio();
+  }else{
+    abrir(ultimaVista);
+  }
+}
+
+// comprar
+function comprar(){
+  mostrarToast("Compra realizada");
+  carrito=[];
+  inicio();
 }
 
 // VOLVER
