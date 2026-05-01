@@ -10,8 +10,13 @@ const admins = ["dante"];
 
 // LOGIN
 function guardarUsuario(){
-  const user=usuario.value.toLowerCase();
-  const pass=password.value;
+  // Es una buena práctica capturar los elementos por su ID explícitamente
+  const usuarioInput = document.getElementById("usuario");
+  const passwordInput = document.getElementById("password");
+  const errorLogin = document.getElementById("errorLogin");
+
+  const user = usuarioInput.value.toLowerCase();
+  const pass = passwordInput.value;
 
   if(!usuariosSistema[user]) return errorLogin.innerText="Usuario no registrado";
   if(usuariosSistema[user]!==pass) return errorLogin.innerText="Contraseña incorrecta";
@@ -25,16 +30,20 @@ function cerrarSesion(){
   location.reload();
 }
 
-// UI
+// UI - Carga inicial
 window.onload=()=>{
-  const user=localStorage.getItem("usuario");
+  const user = localStorage.getItem("usuario");
+  const login = document.getElementById("login");
+  const app = document.getElementById("app");
+  const userInfo = document.getElementById("userInfo");
+  const panelBtn = document.getElementById("panelBtn");
 
-  login.style.display=user?"none":"flex";
-  app.style.display=user?"block":"none";
+  login.style.display = user ? "none" : "flex";
+  app.style.display = user ? "block" : "none";
 
   if(user){
-    userInfo.innerHTML=`USUARIO: ${user.toUpperCase()}`;
-    if(admins.includes(user)) panelBtn.style.display="inline-block";
+    userInfo.innerHTML = `USUARIO: ${user.toUpperCase()}`;
+    if(admins.includes(user)) panelBtn.style.display = "inline-block";
   }
 };
 
@@ -61,22 +70,12 @@ fetch(urlInv)
       imagen:o.imagen
     };
   });
-
-  renderMenu();
 });
-
-function renderMenu(){
-  menu.innerHTML = `
-    <div class="menu-card" onclick="abrir('INVIERNO')"><p>INVIERNO</p></div>
-    <div class="menu-card" onclick="abrir('VERANO')"><p>VERANO</p></div>
-    <div class="menu-card" onclick="abrir('TECNOLOGIA')"><p>TECNOLOGIA</p></div>
-    <div class="menu-card" onclick="abrir('NAVIDEÑO')"><p>NAVIDEÑO</p></div>
-  `;
-}
 
 // MENU
 function abrir(cat){
-  menu.style.display="none";
+  document.getElementById("menu").style.display="none";
+  const productos = document.getElementById("productos");
   productos.style.display="grid";
 
   const filtrados=inventario.filter(p=>p.categoria===cat && p.stock>0);
@@ -85,12 +84,14 @@ function abrir(cat){
   filtrados.forEach(p=>{ if(!unicos[p.id]) unicos[p.id]=p; });
 
   render(Object.values(unicos));
+
+  productos.innerHTML+=`<button onclick="inicio()">⬅ Volver</button>`;
 }
 
 function inicio(){
-  menu.style.display="grid";
-  productos.style.display="none";
-  panel.style.display="none";
+  document.getElementById("menu").style.display="grid";
+  document.getElementById("productos").style.display="none";
+  document.getElementById("panel").style.display="none";
 }
 
 // LISTA
@@ -101,41 +102,46 @@ function render(lista){
     <div class="card" onclick="verProducto('${p.id}')">
       <img src="${p.imagen}">
       <h3>${p.producto}</h3>
-      <p>S/ ${p.unidad}</p>
+      <p style="color:lime;">S/ ${p.unidad}</p>
     </div>`;
   });
-  productos.innerHTML=html;
+  document.getElementById("productos").innerHTML=html;
 }
 
 // DETALLE
 function verProducto(id){
-
   const variantes=inventario.filter(p=>p.id==id);
   const p=variantes[0];
 
   const tallas=[...new Set(variantes.map(v=>v.talla))];
   const stockTotal=variantes.reduce((a,b)=>a+b.stock,0);
 
-  productos.innerHTML=`
+  document.getElementById("productos").innerHTML=`
     <div>
       <img class="detalle-img" src="${p.imagen}">
       <h2>${p.producto}</h2>
 
       <div class="fila-opciones">
         <div>
+          🧵 TALLAS
           <select id="tallaSelect" onchange="cambiarTalla('${id}')">
-            ${tallas.map(t=>`<option>${t}</option>`).join("")}
+            ${tallas.map(t=>`<option value="${t}">${t}</option>`).join("")}
             <option value="TODAS">TODAS</option>
           </select>
         </div>
-
-        <div>STOCK <span id="stockTalla"></span></div>
-        <div>TOTAL ${stockTotal}</div>
+        <div>
+          📦 STOCK
+          <span class="stock" id="stockTalla">0</span>
+        </div>
+        <div>
+          📊 TOTAL
+          <span class="total">${stockTotal}</span>
+        </div>
       </div>
 
       <table id="tablaDetalle"></table>
 
-      <button onclick="inicio()">⬅ Volver</button>
+      <button onclick="volverLista('${p.categoria}')">⬅ Volver</button>
     </div>
   `;
 
@@ -145,27 +151,47 @@ function verProducto(id){
 // FILTRO
 function cambiarTalla(id){
   const talla=document.getElementById("tallaSelect").value;
+  let filtrados;
 
-  let filtrados = talla==="TODAS"
-    ? inventario.filter(p=>p.id==id)
-    : inventario.filter(p=>p.id==id && p.talla==talla);
+  if(talla==="TODAS"){
+    filtrados=inventario.filter(p=>p.id==id);
+  } else {
+    filtrados=inventario.filter(p=>p.id==id && p.talla==talla);
+  }
 
-  document.getElementById("stockTalla").innerText =
-    filtrados.reduce((a,b)=>a+b.stock,0);
+  const total=filtrados.reduce((a,b)=>a+b.stock,0);
+  document.getElementById("stockTalla").innerText=total;
 
-  let filas=`<tr><th>TALLA</th><th>COLOR</th><th>STOCK</th></tr>`;
+  let filas=`
+    <tr>
+      <th>TALLA</th><th>COLOR</th><th>STOCK</th><th>P.UNIDAD</th><th>P.DOCENA</th>
+    </tr>
+  `;
 
   filtrados.forEach(v=>{
-    filas+=`<tr><td>${v.talla}</td><td>${v.color}</td><td>${v.stock}</td></tr>`;
+    filas+=`
+      <tr>
+        <td>${v.talla}</td>
+        <td>${v.color}</td>
+        <td>${v.stock}</td>
+        <td>S/ ${v.unidad}</td>
+        <td>S/ ${v.docena}</td>
+      </tr>
+    `;
   });
 
-  tablaDetalle.innerHTML=filas;
+  document.getElementById("tablaDetalle").innerHTML=filas;
+}
+
+// VOLVER
+function volverLista(cat){
+  abrir(cat);
 }
 
 // PANEL
 function abrirPanel(){
-  menu.style.display="none";
-  panel.style.display="block";
+  document.getElementById("menu").style.display="none";
+  document.getElementById("panel").style.display="block";
 }
 
 function abrirFormulario(){
