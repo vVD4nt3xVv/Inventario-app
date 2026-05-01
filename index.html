@@ -45,14 +45,14 @@
     <div id="seccion-carrito" style="display:none; padding:15px;">
         <h2>Mi Carrito</h2>
         <div id="lista-carrito"></div>
-        <div style="background:#111; padding:15px; border-radius:15px; margin-top:20px;">
+        <div class="resumen-total">
             <h3 style="margin:0; display:flex; justify-content:space-between;">
-                <span>TOTAL:</span>
-                <span id="totalCarrito" style="color:#00aaff;">S/ 0.00</span>
+                <span>TOTAL A PAGAR:</span>
+                <span id="totalCarrito">S/ 0.00</span>
             </h3>
         </div>
-        <button style="background:#28a745; margin-top:15px;" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
-        <button style="background:#333;" onclick="inicio()">⬅ Volver</button>
+        <button class="btn-finalizar" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
+        <button class="btn-volver" onclick="inicio()">⬅ Volver</button>
     </div>
 
     <div id="panel">
