@@ -1,115 +1,380 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A&T KAMIARA - Control de Inventario</title>
-    <!-- Enlace al archivo de estilos -->
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A&T KAMIARA - Inventario</title>
+
+<style>
+/* --- BASE Y LOGIN --- */
+body {
+  background: linear-gradient(135deg,#0b0b0b,#1a1a1a);
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  max-width: 480px;
+  margin: auto;
+  font-size: 15px;
+}
+
+#login { display: flex; align-items: center; justify-content: center; height: 100vh; }
+.login-box { background: #111; padding: 20px; border-radius: 20px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+.login-box input { width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px; background: #222; color: white; box-sizing: border-box; }
+.login-box button { width: 100%; background: red; color: white; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+/* --- APP LAYOUT --- */
+.header-app { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.3); }
+#userInfo { font-weight: bold; font-size: 14px; color: #00aaff; }
+.top-buttons { display: flex; justify-content: center; gap: 10px; margin: 10px; }
+.btn-salir { background: #333; padding: 8px 15px; border-radius: 8px; color: white; border: none; font-size: 12px; }
+.btn-admin { background: #007bff; padding: 8px 15px; border-radius: 8px; color: white; border: none; display: none; font-size: 12px; }
+
+/* --- MENU Y PRODUCTOS --- */
+.grid-menu { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; padding: 10px; }
+.menu-card { background: #111; border-radius: 15px; overflow: hidden; text-align: center; cursor: pointer; transition: 0.3s; }
+.menu-card:active { transform: scale(0.95); }
+.menu-card img { width: 100%; height: 120px; object-fit: cover; }
+.menu-card p { font-weight: bold; margin: 10px 0; }
+
+#productos { display: none; grid-template-columns: repeat(2,1fr); gap: 10px; padding: 10px; }
+.card { background: #111; border-radius: 15px; padding: 10px; text-align: center; }
+.card img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; }
+
+/* --- CARRITO ESTILO FALABELLA --- */
+#seccion-carrito { display: none; padding: 15px; }
+.carrito-header { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1.2fr; font-size: 11px; color: #888; border-bottom: 1px solid #333; padding: 10px 5px; }
+.item-carrito { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1.2fr; align-items: center; padding: 15px 5px; background: #1a1a1a; margin-bottom: 8px; border-radius: 10px; font-size: 13px; border-left: 4px solid red; }
+
+/* CAJA DE DESCUENTO ALINEADA */
+.caja-descuento {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #222;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  margin: 15px 0;
+}
+.caja-descuento span { font-size: 14px; font-weight: bold; color: #ccc; }
+.inputs-desc { display: flex; align-items: center; }
+.inputs-desc input { width: 80px; background: #000; border: 1px solid #444; color: #00ff88; padding: 8px; border-radius: 5px 0 0 5px; text-align: center; font-weight: bold; outline: none; }
+.inputs-desc button { background: #444; color: white; border: none; padding: 9px 12px; border-radius: 0 5px 5px 0; font-size: 12px; cursor: pointer; }
+
+.cart-resumen { background: #111; padding: 20px; border-radius: 15px; box-shadow: 0 -5px 20px rgba(0,0,0,0.4); }
+.total-fila { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.total-final { font-size: 20px; font-weight: bold; color: #00aaff; border-top: 1px solid #333; padding-top: 15px; }
+
+/* NOTIFICACIONES */
+#toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 85%; }
+.toast { padding: 15px; border-radius: 10px; color: white; margin-bottom: 10px; text-align: center; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.5); animation: slideDown 0.4s ease; }
+.toast.success { background: #28a745; }
+.toast.error { background: #dc3545; }
+
+@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* BOTONES ACCIÓN */
+.btn-add { background: #28a745; width: 100%; padding: 15px; border-radius: 12px; color: white; font-weight: bold; border: none; margin-top: 10px; }
+.btn-nav { background: #333; width: 100%; padding: 12px; border-radius: 10px; color: white; border: none; margin-top: 10px; }
+</style>
 </head>
+
 <body>
 
-    <div id="toast-container"></div>
+<div id="toast-container"></div>
 
-    <!-- LOGIN -->
-    <div id="login">
-        <div class="login-box">
-            <h3>Bienvenido</h3>
-            <input id="usuario" placeholder="Usuario">
-            <input id="password" type="password" placeholder="Contraseña">
-            <button onclick="guardarUsuario()">Entrar</button>
-            <p id="errorLogin"></p>
-        </div>
+<!-- SECCIÓN LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <h2 style="margin-top:0;">A&T KAMIARA</h2>
+    <p style="color: #666; font-size: 13px;">Ingrese sus credenciales</p>
+    <input id="usuario" placeholder="Usuario">
+    <input id="password" type="password" placeholder="Contraseña">
+    <button onclick="guardarUsuario()">INICIAR SESIÓN</button>
+    <p id="errorLogin" style="color:red; font-size:12px; margin-top:10px;"></p>
+  </div>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div id="app" style="display:none;">
+  <div class="header-app">
+    <div id="userInfo"></div>
+    <button style="background:#222; border:1px solid #444; color:white; padding:8px 12px; border-radius:20px; font-weight:bold; cursor:pointer;" onclick="mostrarCarrito()">
+      🛒 Carrito (<span id="cart-count">0</span>)
+    </button>
+  </div>
+
+  <div class="top-buttons">
+    <button class="btn-salir" onclick="cerrarSesion()">Cerrar Sesión</button>
+    <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel Admin</button>
+  </div>
+
+  <div id="portada" style="text-align:center;">
+    <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG" style="width:100%; height:180px; object-fit:cover;">
+    <h2 style="margin-bottom:5px;">CATÁLOGO DIGITAL</h2>
+    <div style="color:gray; font-size:12px; letter-spacing: 2px;">PRODUCTOS EXCLUSIVOS</div>
+    <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+  </div>
+
+  <div id="menu" class="grid-menu">
+    <div class="menu-card" onclick="abrir('INVIERNO')">
+      <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p>
     </div>
-
-    <!-- APP PRINCIPAL -->
-    <div id="app" style="display:none;">
-        <div class="header-app">
-            <div id="userInfo"></div>
-            <button class="btn-carrito-flotante" onclick="mostrarCarrito()">
-                🛒 Carrito (<span id="cart-count">0</span>)
-            </button>
-        </div>
-
-        <div class="top-buttons">
-            <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-            <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
-        </div>
-
-        <div id="portada">
-            <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG" alt="Portada">
-            <div class="titulo">CONTROL DE INVENTARIO</div>
-            <div class="sub">---------------------------------------------------------</div>
-        </div>
-
-        <!-- Menú de Categorías -->
-        <div id="menu" class="grid-menu">
-            <div class="menu-card" onclick="abrir('INVIERNO')">
-                <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK">
-                <p>INVIERNO</p>
-            </div>
-            <div class="menu-card" onclick="abrir('VERANO')">
-                <img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx">
-                <p>VERANO</p>
-            </div>
-            <div class="menu-card" onclick="abrir('TECNOLOGIA')">
-                <img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq">
-                <p>TECNOLOGIA</p>
-            </div>
-            <div class="menu-card" onclick="abrir('NAVIDEÑO')">
-                <img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p">
-                <p>NAVIDEÑO</p>
-            </div>
-        </div>
-
-        <div id="productos"></div>
-
-        <!-- SECCIÓN CARRITO ESTILO FALABELLA -->
-        <div id="seccion-carrito">
-            <h2>Tu Carrito</h2>
-            <div class="carrito-header">
-                <span>PRODUCTO</span>
-                <span class="txt-center">CANT.</span>
-                <span class="txt-center">UNIT.</span>
-                <span class="txt-right">TOTAL</span>
-            </div>
-            
-            <div id="lista-carrito"></div>
-            
-            <div class="cart-resumen">
-                <div class="total-fila txt-grey">
-                    <span>Subtotal:</span>
-                    <span id="subtotalCarrito">S/ 0.00</span>
-                </div>
-
-                <!-- Caja de Descuento Alineada -->
-                <div class="caja-descuento">
-                    <span>Descuento (S/):</span>
-                    <div class="caja-descuento-inputs">
-                        <input type="number" id="inputDescuento" placeholder="0.00" min="0" step="0.50">
-                        <button onclick="aplicarDescuento()">Aplicar</button>
-                    </div>
-                </div>
-
-                <div class="total-fila total-final">
-                    <span>TOTAL A PAGAR:</span>
-                    <span id="totalFinalCarrito">S/ 0.00</span>
-                </div>
-
-                <button class="btn-confirmar" onclick="alert('Pedido confirmado')">Confirmar Pedido</button>
-                <button class="btn-volver" onclick="inicio()">⬅ Seguir Comprando</button>
-            </div>
-        </div>
-
-        <div id="panel">
-            <h2>Panel Admin</h2>
-            <button onclick="abrirFormulario()">➕ Agregar Producto</button>
-            <button onclick="verVentas()">📊 Ver Ventas</button>
-            <button onclick="inicio()">⬅ Volver</button>
-        </div>
+    <div class="menu-card" onclick="abrir('VERANO')">
+      <img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p>
     </div>
+    <div class="menu-card" onclick="abrir('TECNOLOGIA')">
+      <img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGÍA</p>
+    </div>
+    <div class="menu-card" onclick="abrir('NAVIDEÑO')">
+      <img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p>
+    </div>
+  </div>
 
-    <!-- Enlace al archivo de lógica -->
-    <script src="script.js"></script>
+  <div id="productos"></div>
+
+  <!-- SECCIÓN CARRITO -->
+  <div id="seccion-carrito">
+    <h2 style="text-align:left;">Mi Pedido</h2>
+    <div class="carrito-header">
+      <span>DETALLE</span>
+      <span style="text-align:center;">CANT.</span>
+      <span style="text-align:center;">UNIT.</span>
+      <span style="text-align:right;">SUBT.</span>
+    </div>
+    
+    <div id="lista-carrito"></div>
+    
+    <div class="cart-resumen">
+      <div class="total-fila" style="color:#888;">
+        <span>Subtotal productos:</span>
+        <span id="subtotalCarrito">S/ 0.00</span>
+      </div>
+
+      <!-- Cuadro de Descuento Alineado -->
+      <div class="caja-descuento">
+        <span>Descuento Manual:</span>
+        <div class="inputs-desc">
+          <input type="number" id="inputDescuento" placeholder="0.00" step="0.50">
+          <button onclick="aplicarDescuento()">APLICAR</button>
+        </div>
+      </div>
+
+      <div class="total-fila total-final">
+        <span>TOTAL NETO:</span>
+        <span id="totalFinalCarrito">S/ 0.00</span>
+      </div>
+
+      <button class="btn-add" onclick="alert('Pedido Registrado')">CONFIRMAR PEDIDO</button>
+      <button class="btn-nav" onclick="inicio()">+ Seguir Comprando</button>
+    </div>
+  </div>
+
+  <div id="panel" style="display:none; padding:20px; text-align:center;">
+    <h2>Panel de Administración</h2>
+    <button class="btn-add" onclick="window.open('https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE')">📊 Ver Base de Datos</button>
+    <button class="btn-nav" onclick="inicio()">Volver al Inicio</button>
+  </div>
+</div>
+
+<script>
+// --- CONFIGURACIÓN ---
+const usuariosPermitidos = { luis:"123", katy:"123", katherine:"123", richard:"123", dante:"admin123" };
+const administradores = ["dante"];
+let inventario = [];
+let carrito = [];
+let descuentoFijo = 0;
+
+// --- INICIO ---
+window.onload = () => {
+  const sesion = localStorage.getItem("usuario");
+  if(sesion) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    document.getElementById("userInfo").innerText = `👤 ${sesion.toUpperCase()}`;
+    if(administradores.includes(sesion)) document.getElementById("panelBtn").style.display = "inline-block";
+    cargarDatos();
+  }
+};
+
+function guardarUsuario() {
+  const u = document.getElementById("usuario").value.toLowerCase();
+  const p = document.getElementById("password").value;
+  if(usuariosPermitidos[u] && usuariosPermitidos[u] === p) {
+    localStorage.setItem("usuario", u);
+    location.reload();
+  } else {
+    document.getElementById("errorLogin").innerText = "Usuario o clave incorrectos";
+  }
+}
+
+function cerrarSesion() {
+  localStorage.removeItem("usuario");
+  location.reload();
+}
+
+// --- DATOS ---
+function cargarDatos() {
+  const url = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      inventario = data.map(i => {
+        let n = {};
+        Object.keys(i).forEach(k => n[k.toLowerCase().trim()] = i[k]);
+        return {
+          id: n.id, producto: n.producto, categoria: (n.categoria||"").toUpperCase(),
+          talla: n.talla, color: n.color, stock: parseInt(n.stock)||0,
+          unidad: parseFloat(n["p.unidad"])||0, docena: parseFloat(n["p.docena"])||0, imagen: n.imagen
+        };
+      });
+    }).catch(err => console.error("Error cargando datos", err));
+}
+
+// --- NAVEGACIÓN ---
+function abrir(cat) {
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("portada").style.display = "none";
+  const cont = document.getElementById("productos");
+  cont.style.display = "grid";
+  
+  const filtrados = inventario.filter(p => p.categoria === cat && p.stock > 0);
+  const unicos = {};
+  filtrados.forEach(p => { if(!unicos[p.id]) unicos[p.id] = p; });
+
+  let h = "";
+  Object.values(unicos).forEach(p => {
+    h += `
+    <div class="card" onclick="verDetalle('${p.id}')">
+      <img src="${p.imagen}">
+      <h3 style="font-size:14px;">${p.producto}</h3>
+      <p style="color:lime; margin:0;">S/ ${p.unidad.toFixed(2)}</p>
+    </div>`;
+  });
+  cont.innerHTML = h + `<button class="btn-nav" style="grid-column: span 2;" onclick="inicio()">⬅ Volver</button>`;
+}
+
+function inicio() {
+  document.getElementById("menu").style.display = "grid";
+  document.getElementById("portada").style.display = "block";
+  document.getElementById("productos").style.display = "none";
+  document.getElementById("seccion-carrito").style.display = "none";
+  document.getElementById("panel").style.display = "none";
+}
+
+function verDetalle(id) {
+  const variantes = inventario.filter(p => p.id == id);
+  const p = variantes[0];
+  const tallas = [...new Set(variantes.map(v => v.talla))];
+
+  document.getElementById("productos").innerHTML = `
+    <div style="grid-column: span 2; padding:10px;">
+      <img src="${p.imagen}" style="width:100%; border-radius:15px;">
+      <h2>${p.producto}</h2>
+      <div style="background:#111; padding:15px; border-radius:10px; display:flex; justify-content:space-between;">
+        <span>🧵 Talla: <select id="selTalla" onchange="renderTabla('${id}')">${tallas.map(t=>`<option>${t}</option>`)}</select></span>
+        <span style="color:#00ff88; font-weight:bold;">S/ ${p.unidad.toFixed(2)}</span>
+      </div>
+      <div id="tablaVar" style="margin-top:15px;"></div>
+      <button class="btn-add" onclick="agregar('${id}')">🛒 Añadir al Carrito</button>
+      <button class="btn-nav" onclick="abrir('${p.categoria}')">⬅ Volver</button>
+    </div>
+  `;
+  renderTabla(id);
+}
+
+function renderTabla(id) {
+  const t = document.getElementById("selTalla").value;
+  const vars = inventario.filter(p => p.id == id && p.talla == t);
+  let html = `<table style="width:100%; text-align:center; font-size:12px; border-collapse:collapse;">
+    <tr style="color:gray;"><th>COLOR</th><th>STOCK</th><th>DOCENA</th></tr>`;
+  vars.forEach(v => {
+    html += `<tr style="border-bottom:1px solid #222;"><td style="padding:10px;">${v.color}</td><td>${v.stock}</td><td>S/ ${v.docena}</td></tr>`;
+  });
+  document.getElementById("tablaVar").innerHTML = html + `</table>`;
+}
+
+// --- CARRITO ---
+function notify(m, t) {
+  const c = document.getElementById("toast-container");
+  const d = document.createElement("div");
+  d.className = `toast ${t}`;
+  d.innerText = m;
+  c.appendChild(d);
+  setTimeout(() => d.remove(), 2000);
+}
+
+function agregar(id) {
+  const talla = document.getElementById("selTalla").value;
+  const item = inventario.find(p => p.id == id && p.talla == talla && p.stock > 0);
+  if(!item) return notify("❌ Sin stock", "error");
+
+  const exist = carrito.find(c => c.id == id && c.talla == talla);
+  if(exist) exist.cantidad++;
+  else carrito.push({...item, cantidad: 1});
+
+  notify("✅ Agregado correctamente", "success");
+  document.getElementById("cart-count").innerText = carrito.reduce((a,b)=>a+b.cantidad,0);
+}
+
+function mostrarCarrito() {
+  document.getElementById("app").querySelectorAll("div").forEach(d => { if(d.id !== 'toast-container') d.style.display="none"; });
+  document.querySelector(".header-app").style.display="flex";
+  document.getElementById("seccion-carrito").style.display="block";
+  renderCart();
+}
+
+function aplicarDescuento() {
+  const val = parseFloat(document.getElementById("inputDescuento").value);
+  descuentoFijo = isNaN(val) ? 0 : val;
+  notify(`💰 Descuento de S/ ${descuentoFijo.toFixed(2)} aplicado`, "success");
+  renderCart();
+}
+
+function renderCart() {
+  const cont = document.getElementById("lista-carrito");
+  let h = ""; let subt = 0;
+  
+  const counts = {};
+  carrito.forEach(p => counts[p.id] = (counts[p.id]||0) + p.cantidad);
+
+  carrito.forEach((p, i) => {
+    const precio = counts[p.id] >= 12 ? p.docena : p.unidad;
+    const total = precio * p.cantidad;
+    subt += total;
+    h += `
+    <div class="item-carrito">
+      <div><b>${p.producto}</b><br><small>${p.talla} | ${p.color}</small></div>
+      <div style="text-align:center;">
+        <button style="background:none; color:white; border:none;" onclick="edit(${i},-1)">-</button>
+        ${p.cantidad}
+        <button style="background:none; color:white; border:none;" onclick="edit(${i},1)">+</button>
+      </div>
+      <div style="text-align:center;">${precio.toFixed(2)}</div>
+      <div style="text-align:right;">${total.toFixed(2)}</div>
+    </div>`;
+  });
+
+  cont.innerHTML = h || "<p style='text-align:center; padding:30px;'>Tu carrito está vacío</p>";
+  document.getElementById("subtotalCarrito").innerText = `S/ ${subt.toFixed(2)}`;
+  const final = subt - descuentoFijo;
+  document.getElementById("totalFinalCarrito").innerText = `S/ ${(final < 0 ? 0 : final).toFixed(2)}`;
+}
+
+function edit(i, v) {
+  carrito[i].cantidad += v;
+  if(carrito[i].cantidad <= 0) carrito.splice(i,1);
+  renderCart();
+  document.getElementById("cart-count").innerText = carrito.reduce((a,b)=>a+b.cantidad,0);
+}
+
+function abrirPanel() {
+  inicio();
+  document.getElementById("menu").style.display="none";
+  document.getElementById("portada").style.display="none";
+  document.getElementById("panel").style.display="block";
+}
+</script>
+
 </body>
 </html>
