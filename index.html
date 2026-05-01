@@ -66,6 +66,11 @@ body {
   color:white;
 }
 
+/* PORTADA */
+#portada img {width:100%;height:200px;object-fit:cover;}
+.titulo {text-align:center;font-size:24px;}
+.sub {text-align:center;color:gray;font-size:14px;}
+
 /* MENU */
 .grid-menu {
   display:grid;
@@ -95,12 +100,15 @@ body {
   padding:10px;
   text-align:center;
   cursor:pointer;
+  transition:0.2s;
 }
+.card:hover {transform:scale(1.03);}
 
-.card img {width:100%;height:140px;object-fit:cover;}
+.card img {width:100%;height:140px;object-fit:cover;border-radius:10px;}
 
 .detalle-img {width:100%;border-radius:15px;}
 
+/* FILA */
 .fila-opciones {
   display:flex;
   justify-content:space-between;
@@ -117,9 +125,10 @@ table {
   width:100%;
   margin-top:10px;
   background:#111;
+  border-radius:10px;
 }
 
-th,td {padding:8px;text-align:center;}
+th,td {padding:8px;text-align:center;font-size:14px;}
 
 button {
   padding:10px;
@@ -136,18 +145,23 @@ button {
   left:50%;
   transform:translateX(-50%);
   background:#222;
-  padding:10px 20px;
+  padding:12px 20px;
   border-radius:10px;
   opacity:0;
   transition:0.3s;
+  z-index:999;
 }
 #toast.show {opacity:1;}
 
+h2{text-align:center;}
+
+#panel {display:none;padding:20px;}
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
 <div id="login">
   <div class="login-box">
     <h3>Bienvenido</h3>
@@ -158,6 +172,7 @@ button {
   </div>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
 
 <div id="userInfo"></div>
@@ -168,16 +183,25 @@ button {
   <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
 </div>
 
+<div id="portada">
+  <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
+  <div class="titulo">CONTROL DE INVENTARIO</div>
+  <div class="sub">------------------------------------------</div>
+</div>
+
 <div id="menu" class="grid-menu">
-  <div class="menu-card" onclick="abrir('INVIERNO')"><p>INVIERNO</p></div>
-  <div class="menu-card" onclick="abrir('VERANO')"><p>VERANO</p></div>
-  <div class="menu-card" onclick="abrir('TECNOLOGIA')"><p>TECNOLOGIA</p></div>
-  <div class="menu-card" onclick="abrir('NAVIDEÑO')"><p>NAVIDEÑO</p></div>
+  <div class="menu-card" onclick="abrir('INVIERNO')"><img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK"><p>INVIERNO</p></div>
+  <div class="menu-card" onclick="abrir('VERANO')"><img src="https://lh3.googleusercontent.com/d/1-SOYaQM1NdW1UrNFCdLjuzb2l6eIvNOx"><p>VERANO</p></div>
+  <div class="menu-card" onclick="abrir('TECNOLOGIA')"><img src="https://lh3.googleusercontent.com/d/1EEwUFXk3iC6QvMtb29gh3ySLuQRK_aPq"><p>TECNOLOGIA</p></div>
+  <div class="menu-card" onclick="abrir('NAVIDEÑO')"><img src="https://lh3.googleusercontent.com/d/1HnwTLL0kiuRe7AC_PusCq5UNvKDIlN6p"><p>NAVIDEÑO</p></div>
 </div>
 
 <div id="productos"></div>
 
 <div id="panel">
+  <h2>Panel Admin</h2>
+  <button onclick="abrirFormulario()">➕ Agregar Producto</button>
+  <button onclick="verVentas()">📊 Ver Ventas</button>
   <button onclick="inicio()">⬅ Volver</button>
 </div>
 
@@ -187,20 +211,21 @@ button {
 
 <script>
 
-// LOGIN
-const usuariosSistema={dante:"admin123"};
+// USUARIOS
+const usuariosSistema={
+  luis:"123",katy:"123",katherine:"123",richard:"123",dante:"admin123"
+};
 const admins=["dante"];
 
+// LOGIN
 function guardarUsuario(){
-  const u=usuario.value;
-  const p=password.value;
+  const user=usuario.value.toLowerCase();
+  const pass=password.value;
 
-  if(usuariosSistema[u]!==p){
-    errorLogin.innerText="Error";
-    return;
-  }
+  if(!usuariosSistema[user]) return errorLogin.innerText="Usuario no registrado";
+  if(usuariosSistema[user]!==pass) return errorLogin.innerText="Contraseña incorrecta";
 
-  localStorage.setItem("usuario",u);
+  localStorage.setItem("usuario",user);
   location.reload();
 }
 
@@ -210,13 +235,14 @@ function cerrarSesion(){
 }
 
 window.onload=()=>{
-  const u=localStorage.getItem("usuario");
-  login.style.display=u?"none":"flex";
-  app.style.display=u?"block":"none";
+  const user=localStorage.getItem("usuario");
 
-  if(u){
-    userInfo.innerText="USUARIO: "+u;
-    if(admins.includes(u)) panelBtn.style.display="inline-block";
+  login.style.display=user?"none":"flex";
+  app.style.display=user?"block":"none";
+
+  if(user){
+    userInfo.innerHTML=`USUARIO: ${user.toUpperCase()}`;
+    if(admins.includes(user)) panelBtn.style.display="inline-block";
   }
 };
 
@@ -228,44 +254,74 @@ function mostrarToast(msg){
   setTimeout(()=>t.classList.remove("show"),2000);
 }
 
-// DATA
+// INVENTARIO
+const urlInv="https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
 let inventario=[];
 let carrito=[];
 
-fetch("https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO")
+fetch(urlInv)
 .then(r=>r.json())
-.then(d=>inventario=d);
+.then(d=>{
+  inventario=d.map(p=>{
+    let o={};
+    Object.keys(p).forEach(k=>o[k.toLowerCase().trim()]=p[k]);
+
+    return {
+      id:o.id,
+      producto:o.producto,
+      categoria:(o.categoria||"").toUpperCase(),
+      talla:o.talla,
+      color:o.color,
+      stock:parseInt(o.stock)||0,
+      unidad:parseFloat(o["p.unidad"])||0,
+      docena:parseFloat(o["p.docena"])||0,
+      imagen:o.imagen
+    };
+  });
+});
 
 // MENU
 function abrir(cat){
-  const lista=inventario.filter(p=>p.categoria===cat);
+  if(inventario.length===0){mostrarToast("Cargando...");return;}
+
+  menu.style.display="none";
+  productos.style.display="block";
+
+  const filtrados=inventario.filter(p=>p.categoria===cat && p.stock>0);
 
   let html="";
-  lista.forEach(p=>{
-    html+=`<div class="card" onclick="verProducto('${p.id}')">${p.producto}</div>`;
+  filtrados.forEach(p=>{
+    html+=`
+    <div class="card" onclick="verProducto('${p.id}')">
+      <img src="${p.imagen}">
+      <h3>${p.producto}</h3>
+      <p style="color:lime;">S/ ${p.unidad}</p>
+    </div>`;
   });
 
-  productos.style.display="block";
-  menu.style.display="none";
-  productos.innerHTML=html;
+  productos.innerHTML=html+`<button onclick="inicio()">⬅ Volver</button>`;
 }
 
 function inicio(){
   menu.style.display="grid";
   productos.style.display="none";
+  panel.style.display="none";
 }
 
 // DETALLE
 function verProducto(id){
 
-  const lista=inventario.filter(p=>p.id==id);
+  const variantes=inventario.filter(p=>p.id==id);
+  const p=variantes[0];
 
   let html=`
-  <h2>${lista[0].producto}</h2>
-  <table>
-  <tr><th></th><th>Talla</th><th>Color</th><th>Stock</th></tr>`;
+    <img class="detalle-img" src="${p.imagen}">
+    <h2>${p.producto}</h2>
 
-  lista.forEach((v,i)=>{
+    <table>
+    <tr><th></th><th>Talla</th><th>Color</th><th>Stock</th></tr>`;
+
+  variantes.forEach((v,i)=>{
     html+=`
     <tr>
       <td><input type="radio" name="prodSelect" value="${i}"></td>
@@ -277,9 +333,9 @@ function verProducto(id){
 
   html+=`</table>
 
-  <div style="display:flex; justify-content:space-between;">
+  <div style="display:flex;justify-content:space-between;">
     <button onclick="inicio()">⬅ Volver</button>
-    <button style="background:#007bff;" onclick="agregarCarrito('${id}')">Agregar</button>
+    <button style="background:#007bff;" onclick="agregarCarrito('${id}')">🛒 Agregar</button>
   </div>`;
 
   productos.innerHTML=html;
@@ -300,6 +356,11 @@ function agregarCarrito(id){
 
   const item=inventario.filter(p=>p.id==id)[index];
 
+  if(item.stock<=0){
+    mostrarToast("Sin stock");
+    return;
+  }
+
   carrito.push(item);
 
   mostrarToast(item.producto+" agregado");
@@ -312,12 +373,13 @@ function verCarrito(){
     return;
   }
 
-  let html="<h2>Carrito</h2><table>";
+  let html="<h2>🛒 Carrito</h2><table>";
 
   carrito.forEach((c,i)=>{
     html+=`
     <tr>
       <td>${c.producto}</td>
+      <td>${c.talla}</td>
       <td><button onclick="eliminarItem(${i})">❌</button></td>
     </tr>`;
   });
@@ -338,6 +400,20 @@ function eliminarItem(i){
     mostrarToast(n+" eliminado");
     verCarrito();
   }
+}
+
+// PANEL
+function abrirPanel(){
+  menu.style.display="none";
+  panel.style.display="block";
+}
+
+function abrirFormulario(){
+  window.open("https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform");
+}
+
+function verVentas(){
+  window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE");
 }
 
 </script>
