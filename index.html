@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A&T KAMIARA</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <h3>Bienvenido</h3>
+    <input id="usuario" placeholder="Usuario">
+    <input id="password" type="password" placeholder="Contraseña">
+    <button onclick="guardarUsuario()">Entrar</button>
+    <p id="errorLogin"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+
+<div id="userInfo"></div>
+
+<div class="top-buttons">
+  <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+  <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
+</div>
+
+<div id="portada">
+  <div class="titulo">CONTROL DE INVENTARIO</div>
+</div>
+
+<div id="menu" class="grid-menu">
+  <div class="menu-card" onclick="abrir('INVIERNO')"><p>INVIERNO</p></div>
+  <div class="menu-card" onclick="abrir('VERANO')"><p>VERANO</p></div>
+</div>
+
+<div id="productos"></div>
+
+<div id="panel" style="display:none;">
+  <h2>Panel Admin</h2>
+  <button onclick="abrirFormulario()">➕ Agregar Producto</button>
+  <button onclick="verVentas()">📊 Ver Ventas</button>
+  <button onclick="inicio()">⬅ Volver</button>
+</div>
+
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/inventario.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
