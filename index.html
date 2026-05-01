@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A&T KAMIARA - Sistema Oficial</title>
+    <title>SISTEMA A&T KAMIARA</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Librería para generar el Voucher PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-<div id="toast">¡Añadido con éxito!</div>
+<div id="toast">¡Producto añadido!</div>
 
-<!-- LOGIN -->
+<!-- PANTALLA DE ACCESO (LOGIN) -->
 <div id="login-screen">
   <div class="login-box">
     <h2 style="color:#5cb85c; letter-spacing:2px;">A&T KAMIARA</h2>
@@ -25,57 +26,59 @@
 
 <!-- APLICACIÓN PRINCIPAL -->
 <div id="app" style="display:none;">
-    <!-- BARRA SUPERIOR FIJA (3 COLUMNAS) -->
+    
+    <!-- BARRA SUPERIOR FIJA (STicky - 3 COLUMNAS) -->
     <header class="top-nav">
         <div class="nav-col-izq">
             <span id="user-display"></span><br>
-            <button class="btn-sm-red" onclick="salir()">Salir</button>
+            <button class="btn-salir" onclick="salir()">Cerrar Sesión</button>
         </div>
         <div class="nav-col-cen">
-            <button id="adminBtn" class="btn-sm-blue" style="display:none;" onclick="abrirAdmin()">PANEL ADMIN</button>
+            <!-- Solo visible para administrador -->
+            <button id="adminBtn" class="btn-admin" style="display:none;" onclick="abrirAdmin()">PANEL ADMIN</button>
         </div>
         <div class="nav-col-der">
-            <button class="btn-sm-green" onclick="verCarrito()">🛒 Carrito (<span id="count">0</span>)</button>
+            <button class="btn-cart" onclick="verCarrito()">🛒 Carrito (<span id="count">0</span>)</button>
         </div>
     </header>
 
-    <main id="content-area">
-        <!-- VISTA INICIO -->
+    <main id="main-content">
+        <!-- VISTA DE INICIO (CATEGORÍAS) -->
         <section id="v-inicio">
-            <div id="portada">
+            <div class="portada">
                 <img src="https://lh3.googleusercontent.com/d/1iSusezseDbUbs0jztHYHmSaX6kyzUKLG">
             </div>
             <div class="grid-menu" id="menu-cats"></div>
         </section>
 
-        <!-- VISTA PRODUCTOS (SCROLLABLE) -->
+        <!-- VISTA DE PRODUCTOS POR CATEGORÍA -->
         <section id="v-productos" style="display:none;">
-            <h2 class="section-title" id="cat-nombre">CATEGORÍA</h2>
+            <h2 class="section-title" id="cat-nombre">PRODUCTOS</h2>
             <div class="scroll-container" id="lista-prods"></div>
         </section>
 
-        <!-- VISTA DETALLE -->
+        <!-- VISTA DETALLE DEL PRODUCTO -->
         <section id="v-detalle" style="display:none; padding:15px;">
-            <div id="detalle-header" class="stock-info-bar">
-                <div id="stock-total-div">ST. TOTAL: 0</div>
-                <div id="stock-talla-div">ST. TALLA: 0</div>
+            <div class="stock-info-bar">
+                <div id="st-total">STOCK TOTAL: 0</div>
+                <div id="st-talla" style="color: #ffeb3b;">POR TALLA: 0</div>
                 <div></div>
             </div>
             <div id="detalle-content"></div>
         </section>
 
-        <!-- VISTA CARRITO -->
+        <!-- VISTA DEL CARRITO DE COMPRAS -->
         <section id="v-carrito" style="display:none; padding:15px;">
-            <h2 class="section-title">DETALLE DE COMPRA</h2>
+            <h2 class="section-title">RESUMEN DE PEDIDO</h2>
             <div id="cart-list"></div>
-            <div id="cart-total" class="total-display"></div>
+            <div id="cart-total" class="total-box"></div>
         </section>
 
-        <!-- VISTA VOUCHER -->
+        <!-- VISTA DE VOUCHER Y WHATSAPP -->
         <section id="v-voucher" style="display:none; padding:15px;">
             <div id="voucher-legal"></div>
-            <div class="ws-input-container">
-                <input type="tel" id="ws-phone" placeholder="WhatsApp del Cliente">
+            <div class="ws-container">
+                <input type="tel" id="ws-phone" placeholder="Número de WhatsApp del Cliente">
             </div>
         </section>
     </main>
@@ -83,7 +86,7 @@
     <!-- NAVEGACIÓN INFERIOR FIJA (3 COLUMNAS) -->
     <footer class="footer-nav" id="controles" style="display:none;">
         <button class="btn-nav-izq" id="btn-back">← Volver</button>
-        <div></div> <!-- Espacio central libre -->
+        <div class="nav-col-cen"></div> <!-- Espacio central vacío -->
         <button class="btn-nav-der" id="btn-next">Acción</button>
     </footer>
 </div>
