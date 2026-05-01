@@ -58,19 +58,19 @@ body {
 /* BOTONES */
 .top-buttons {
   display:flex;
-  justify-content:space-between;
+  justify-content:center;
+  gap:10px;
   margin:10px;
 }
 
-.btn-salir {background:red;}
-.btn-carrito {background:#00c853;}
-.btn-admin {background:#007bff;display:none;}
-
-.top-buttons button{
+.btn-salir, .btn-admin {
   padding:8px 18px;
   border-radius:8px;
   font-size:13px;
 }
+
+.btn-salir {background:red;}
+.btn-admin {background:#007bff;display:none;}
 
 /* PORTADA */
 #portada img {width:100%;height:200px;object-fit:cover;}
@@ -153,26 +153,30 @@ body {
   flex:1;
 }
 
-/* BOTONES DETALLE */
-.fila-botones {
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-}
-.fila-botones button {
-  width:50%;
-}
-
 /* COLORES */
-.stock {color:#00ff88;font-weight:bold;}
-.total {color:#00aaff;font-weight:bold;}
+.stock {
+  color:#00ff88;
+  font-weight:bold;
+  margin-left:5px;
+  font-size:15px;
+}
 
+.total {
+  color:#00aaff;
+  font-weight:bold;
+  margin-left:5px;
+  font-size:15px;
+}
+
+/* SELECT */
 select {
   background:#222;
   color:white;
   border:none;
   border-radius:8px;
   padding:6px;
+  margin-left:5px;
+  font-size:14px;
 }
 
 /* TABLA */
@@ -184,32 +188,28 @@ table {
   text-align:center;
 }
 
-th,td {padding:8px;font-size:14px;}
+th,td {
+  padding:8px;
+  font-size:14px;
+}
 
+/* BOTONES */
 button {
+  width:100%;
+  margin-top:10px;
+  padding:12px;
   border:none;
   border-radius:10px;
-  padding:10px;
+  background:red;
   color:white;
+  font-size:15px;
 }
 
-h2 {text-align:center;}
+h2 {
+  text-align:center;
+}
 
 #panel {display:none;padding:20px;}
-
-/* TOAST */
-#toast {
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#111;
-  padding:10px 20px;
-  border-radius:10px;
-  opacity:0;
-  transition:0.3s;
-}
-#toast.show {opacity:1;}
 </style>
 </head>
 
@@ -233,7 +233,7 @@ h2 {text-align:center;}
 
 <div class="top-buttons">
   <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
-  <button class="btn-carrito" onclick="verCarrito()">🛒</button>
+  <button style="background:#00c853;" onclick="verCarrito()">🛒</button>
   <button class="btn-admin" id="panelBtn" onclick="abrirPanel()">Panel</button>
 </div>
 
@@ -261,25 +261,40 @@ h2 {text-align:center;}
 
 </div>
 
-<div id="toast"></div>
-
 <script>
 
-// NUEVO
-let carrito=[];
-let detalleActual=[];
+// 🔥 NUEVO
+let carrito = [];
+let detalleActual = [];
 
-// (TODO TU CODIGO ORIGINAL SE MANTIENE IGUAL HASTA ABAJO...)
+// TODO TU CÓDIGO ORIGINAL SIGUE IGUAL...
 
-// SOLO CAMBIAMOS ESTAS FUNCIONES:
+// SOLO AGREGO FUNCIONES NUEVAS ABAJO
+
+function agregarCarrito(){
+  const radios=document.getElementsByName("prodSelect");
+  let index=-1;
+
+  radios.forEach((r,i)=>{ if(r.checked) index=i; });
+
+  if(index===-1){
+    alert("Selecciona producto");
+    return;
+  }
+
+  const item=detalleActual[index];
+  carrito.push({...item,cantidad:1});
+
+  alert("Producto agregado");
+}
 
 function verCarrito(){
 
   let html=`<h2 style="text-align:center;">🛒 Carrito</h2>`;
 
   if(carrito.length===0){
-    html+=`<p style="text-align:center;">Carrito vacío</p>`;
-    html+=`<button onclick="inicio()">⬅ Volver</button>`;
+    html+=`<p style="text-align:center;">Carrito vacío</p>
+    <button onclick="inicio()">⬅ Volver</button>`;
     productos.innerHTML=html;
     return;
   }
@@ -312,8 +327,8 @@ function verCarrito(){
       ${c.cantidad}
       <button onclick="sumar(${i})">+</button>
     </td>
-    <td style="text-align:right;">S/ ${precio}</td>
-    <td style="text-align:right;">S/ ${sub.toFixed(2)}</td>
+    <td>S/ ${precio}</td>
+    <td>S/ ${sub.toFixed(2)}</td>
     <td><button onclick="eliminarItem(${i})">❌</button></td>
     </tr>`;
   });
@@ -321,34 +336,48 @@ function verCarrito(){
   html+=`</table>
 
   <div style="text-align:center;margin-top:10px;">
-    <input id="desc" type="number" placeholder="Descuento">
-    <button onclick="aplicarDesc()">Aplicar</button>
+    <input id="descuento" type="number" placeholder="Descuento">
+    <button onclick="aplicarDescuento()">Aplicar</button>
   </div>
 
-  <h3 style="text-align:center;">TOTAL: S/ <span id="totalFinal">${total.toFixed(2)}</span></h3>
+  <h3 style="text-align:center;">
+  TOTAL: S/ <span id="totalFinal">${total.toFixed(2)}</span>
+  </h3>
 
-  <div class="fila-botones">
-    <button onclick="inicio()">⬅ Volver</button>
-    <button style="background:#00c853;" onclick="comprar()">COMPRAR</button>
-  </div>`;
+  <button onclick="inicio()">⬅ Volver</button>
+  <button style="background:#00c853;" onclick="comprar()">COMPRAR</button>`;
 
   productos.innerHTML=html;
 }
 
-function aplicarDesc(){
+function sumar(i){
+  carrito[i].cantidad++;
+  verCarrito();
+}
+
+function restar(i){
+  carrito[i].cantidad--;
+  if(carrito[i].cantidad<=0) carrito.splice(i,1);
+  verCarrito();
+}
+
+function eliminarItem(i){
+  carrito.splice(i,1);
+  verCarrito();
+}
+
+function aplicarDescuento(){
   let total=parseFloat(document.getElementById("totalFinal").innerText);
-  let d=parseFloat(document.getElementById("desc").value)||0;
+  let d=parseFloat(document.getElementById("descuento").value)||0;
+
   if(d>total)d=total;
 
-  let final=total-d;
-  document.getElementById("totalFinal").innerText=final.toFixed(2);
-
-  mostrarToast("Descuento aplicado","green");
+  document.getElementById("totalFinal").innerText=(total-d).toFixed(2);
 }
 
 function comprar(){
   let total=parseFloat(document.getElementById("totalFinal").innerText)||0;
-  mostrarToast("Venta S/ "+total,"green");
+  alert("Venta S/ "+total);
   carrito=[];
   inicio();
 }
