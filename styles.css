@@ -205,5 +205,78 @@ button {
 h2 {
   text-align:center;
 }
+/* DISEÑO DEL CARRITO */
+.item-carrito {
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid red;
+}
+
+.info-principal { font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #ff4d4d; }
+
+.grid-carrito {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr 1fr; /* Talla, Color, Cant, Subtotal */
+    align-items: center;
+    font-size: 13px;
+    gap: 5px;
+}
+
+.controles-cant {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #222;
+    padding: 5px;
+    border-radius: 8px;
+    justify-content: center;
+}
+
+.btn-cant {
+    background: #444;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    margin: 0;
+    line-height: 20px;
+}
+
+.btn-eliminar {
+    background: none;
+    color: #ff4d4d;
+    font-weight: bold;
+    width: auto;
+    margin: 0;
+    padding: 0 5px;
+}
+
+.resumen-total {
+    margin-top: 20px;
+    border-top: 1px solid #444;
+    padding-top: 15px;
+}
+
+.fila-resumen {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.total-grande {
+    font-size: 20px;
+    font-weight: bold;
+    color: #00ff88;
+}
+
+.input-desc { display: flex; gap: 5px; }
+#montoDescuento { width: 60px; background: #222; color: white; border: 1px solid #444; border-radius: 5px; text-align: center; }
+.btn-aplicar { background: #28a745; margin: 0; padding: 5px 10px; width: auto; font-size: 12px; }
+
+.botones-carrito { display: flex; gap: 10px; }
+.btn-volver { background: #555; }
+.btn-pagar { background: #28a745; }
 
 #panel {display:none;padding:20px;}
