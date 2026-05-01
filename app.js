@@ -1,41 +1,26 @@
 const usuariosSistema = { luis:"123", katy:"123", katherine:"123", richard:"123", dante:"admin123" };
-const admins = ["dante"];
 let inventario = [];
 let carrito = [];
-let descuentoTotal = 0;
 
-function mostrarMensaje(texto, tipo) {
-    const container = document.getElementById("toast-container");
-    const div = document.createElement("div");
-    div.className = `toast ${tipo}`;
-    div.innerText = texto;
-    container.appendChild(div);
-    setTimeout(() => div.remove(), 2500);
-}
-
+// Carga inicial y Login
 window.onload = () => {
-    const user = localStorage.getItem("usuario");
-    if(user) {
+    if(localStorage.getItem("usuario")) {
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-        document.getElementById("userInfo").innerHTML = `👤 ${user.toUpperCase()}`;
-        if(admins.includes(user)) document.getElementById("panelBtn").style.display = "inline-block";
-        cargarInventario();
+        cargarDatos();
     }
 };
 
 function guardarUsuario() {
-    const u = usuario.value.toLowerCase();
-    const p = password.value;
+    const u = document.getElementById("inputUsuario").value.toLowerCase();
+    const p = document.getElementById("inputPassword").value;
     if(usuariosSistema[u] === p) {
         localStorage.setItem("usuario", u);
         location.reload();
-    } else { errorLogin.innerText = "Acceso denegado"; }
+    } else { document.getElementById("errorLogin").innerText = "Credenciales incorrectas"; }
 }
 
-function cerrarSesion() { localStorage.removeItem("usuario"); location.reload(); }
-
-async function cargarInventario() {
+async function cargarDatos() {
     const url = "https://opensheet.elk.sh/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE/INVENTARIO";
     const r = await fetch(url);
     const d = await r.json();
@@ -45,109 +30,170 @@ async function cargarInventario() {
         return {
             id: o.id, producto: o.producto, categoria: (o.categoria||"").toUpperCase(),
             talla: o.talla, color: o.color, stock: parseInt(o.stock)||0,
-            unidad: parseFloat(o["p.unidad"]), imagen: o.imagen
+            pUnitario: parseFloat(o["p.unidad"]), pDocena: parseFloat(o["p.docena"]), imagen: o.imagen
         };
     });
+    mostrarMenu();
 }
 
-function abrir(cat) {
-    inicio();
-    document.getElementById("menu").style.display = "none";
-    document.getElementById("productos").style.display = "grid";
-    const filtrados = inventario.filter(p => p.categoria === cat && p.stock > 0);
-    const unicos = {};
-    filtrados.forEach(p => { if(!unicos[p.id]) unicos[p.id] = p; });
+function mostrarMenu() {
+    const cats = ["INVIERNO", "VERANO", "TECNOLOGIA", "NAVIDEÑO"];
     let html = "";
-    Object.values(unicos).forEach(p => {
-        html += `<div class="card" onclick="verProducto('${p.id}')"><img src="${p.imagen}"><h3>${p.producto}</h3><p style="color:lime">S/ ${p.unidad}</p></div>`;
+    cats.forEach(c => {
+        html += `<div style="background:#111; border-radius:15px; text-align:center; padding-bottom:10px;" onclick="verCategoria('${c}')">
+                    <img src="https://lh3.googleusercontent.com/d/1ndTNY35U3vt6Pu5dFtgcLpNS9DqmMemK" style="width:100%; height:100px; object-fit:cover; border-radius:15px 15px 0 0;">
+                    <p>${c}</p>
+                 </div>`;
     });
-    document.getElementById("productos").innerHTML = html + `<div class="footer-btns"><button class="btn-rojo" onclick="inicio()">Volver</button></div>`;
+    document.getElementById("menu").innerHTML = html;
 }
 
-function verProducto(id) {
-    const variantes = inventario.filter(p => p.id == id);
+function verCategoria(cat) {
+    document.getElementById("menu").style.display = "none";
+    document.getElementById("productos-vista").style.display = "block";
+    const lista = inventario.filter(p => p.categoria === cat);
+    const unicos = [...new Map(lista.map(item => [item['id'], item])).values()];
+
+    let html = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
+    unicos.forEach(p => {
+        html += `<div style="background:#111; padding:10px; border-radius:10px; text-align:center;" onclick="verDetalle('${p.id}')">
+                    <img src="${p.imagen}" style="width:100%; height:120px; object-fit:cover;">
+                    <h4>${p.producto}</h4>
+                    <p style="color:lime">S/ ${p.pUnitario}</p>
+                 </div>`;
+    });
+    html += `</div><div class="footer-btns"><button class="btn-izq" onclick="location.reload()">Volver</button></div>`;
+    document.getElementById("productos-vista").innerHTML = html;
+}
+
+function verDetalle(id) {
+    const variantes = inventario.filter(v => v.id == id);
     const p = variantes[0];
-    const tallas = [...new Set(variantes.map(v => v.talla))];
-    document.getElementById("productos").innerHTML = `
-        <div style="grid-column: span 2;">
-            <img src="${p.imagen}" style="width:100%; border-radius:15px; height:200px; object-fit:cover;">
+    const stockTotal = variantes.reduce((acc, v) => acc + v.stock, 0);
+
+    let html = `
+        <div style="text-align:center;">
+            <img src="${p.imagen}" style="width:100%; border-radius:15px; max-height:250px; object-fit:contain;">
+            <div style="background:#222; padding:5px; margin:10px 0; border-radius:5px;">STOCK TOTAL: ${stockTotal}</div>
             <h2>${p.producto}</h2>
-            <span>TALLA: <select id="selTalla" onchange="actualizarTabla('${id}')">${tallas.map(t=>`<option>${t}</option>`)}</select></span>
-            <table id="tablaVar"></table>
-            <div class="footer-btns">
-                <button class="btn-rojo" onclick="abrir('${p.categoria}')">Volver</button>
-                <button class="btn-verde" onclick="agregarAlCarrito('${p.categoria}')">Añadir</button>
-            </div>
+            <table>
+                <tr><th>Escoger</th><th>Talla</th><th>Color</th><th>Stock</th></tr>`;
+    
+    variantes.forEach(v => {
+        html += `<tr>
+            <td><input type="checkbox" class="select-check" data-idx="${inventario.indexOf(v)}"></td>
+            <td>${v.talla}</td><td>${v.color}</td><td>${v.stock}</td>
+        </tr>`;
+    });
+
+    html += `</table></div>
+        <div class="footer-btns">
+            <button class="btn-izq" onclick="verCategoria('${p.categoria}')">Volver</button>
+            <button class="btn-der" onclick="agregarAlCarrito()">Añadir</button>
         </div>`;
-    actualizarTabla(id);
+    document.getElementById("productos-vista").innerHTML = html;
 }
 
-function actualizarTabla(id) {
-    const t = document.getElementById("selTalla").value;
-    const vars = inventario.filter(p => p.id == id && p.talla == t);
-    let html = `<tr><th>Escoger</th><th>Color</th><th>Stock</th></tr>`;
-    vars.forEach(v => {
-        html += `<tr><td><input type="checkbox" class="select-check" data-id="${inventario.indexOf(v)}"></td><td>${v.color}</td><td>${v.stock}</td></tr>`;
-    });
-    document.getElementById("tablaVar").innerHTML = html;
-}
-
-function agregarAlCarrito(cat) {
+function agregarAlCarrito() {
     const checks = document.querySelectorAll(".select-check:checked");
-    if(checks.length === 0) return mostrarMensaje("Selecciona un color", "error");
+    if(checks.length === 0) return alert("Selecciona una opción");
+    
     checks.forEach(c => {
-        const item = inventario[c.dataset.id];
-        const existe = carrito.find(x => x.id_unico === c.dataset.id);
-        if(existe) { existe.cant++; } else { carrito.push({...item, cant: 1, id_unico: c.dataset.id}); }
+        const item = inventario[c.dataset.idx];
+        const existe = carrito.find(x => x.idx === c.dataset.idx);
+        if(existe) { existe.cant++; } else { carrito.push({...item, cant: 1, idx: c.dataset.idx}); }
+        c.checked = false; // Quitar marca sin reiniciar vista
     });
-    document.getElementById("cart-count").innerText = carrito.length;
-    mostrarMensaje("✅ Añadido", "success");
-    abrir(cat); // Reset del selector
+    alert("¡Añadido!");
 }
 
 function verCarrito() {
     document.getElementById("main-content").style.display = "none";
-    document.getElementById("carrito-view").style.display = "block";
+    document.getElementById("productos-vista").style.display = "none";
+    document.getElementById("carrito-vista").style.display = "block";
+
     let subtotal = 0;
-    let html = `<table><tr><th>Producto</th><th>Cant.</th><th>Sub.</th></tr>`;
+    let html = `<h2>Mi Carrito</h2><table><tr><th>Prod/Talla</th><th>Cant</th><th>Sub</th><th>X</th></tr>`;
+    
     carrito.forEach((p, i) => {
-        let sub = p.unidad * p.cant; subtotal += sub;
-        html += `<tr><td>${p.producto}<br><small>${p.talla}-${p.color}</small></td><td><div class="cant-control"><button class="btn-qty" onclick="cambiarCant(${i},-1)">-</button>${p.cant}<button class="btn-qty" onclick="cambiarCant(${i},1)">+</button></div></td><td>S/ ${sub.toFixed(2)}</td></tr>`;
+        // Lógica de precio por docena
+        let precioAplicado = (p.cant >= 12) ? p.pDocena : p.pUnitario;
+        let sub = precioAplicado * p.cant;
+        subtotal += sub;
+
+        html += `<tr>
+            <td>${p.producto}<br><small>${p.talla} - ${p.color}</small></td>
+            <td>${p.cant}</td>
+            <td>S/ ${sub.toFixed(2)}</td>
+            <td><button style="background:red; color:white; border:none; border-radius:50%;" onclick="eliminarDelCarrito(${i})">×</button></td>
+        </tr>`;
     });
-    document.getElementById("lista-carrito").innerHTML = html + `</table>`;
-    const totalNeto = subtotal - descuentoTotal;
-    document.getElementById("resumen-pago").innerHTML = `
-        <div class="desc-area"><button class="btn-qty" style="width:auto; padding:5px 10px; border-radius:5px;" onclick="aplicarD()">Aplicar</button><input type="number" id="valDesc" placeholder="S/ Desc" style="width:80px; text-align:right;"></div>
-        <div style="display:flex; justify-content:space-between; font-weight:bold; color:cyan;"><span>TOTAL:</span><span>S/ ${totalNeto.toFixed(2)}</span></div>
-        <div class="footer-btns"><button class="btn-rojo" onclick="inicio()">Volver</button><button class="btn-verde" onclick="irAVoucher()">Pagar</button></div>`;
+
+    html += `</table>
+        <h3 style="text-align:right;">Total: S/ ${subtotal.toFixed(2)}</h3>
+        <div class="footer-btns">
+            <button class="btn-izq" onclick="location.reload()">Cerrar</button>
+            <button class="btn-der" onclick="generarVoucher()">Pagar</button>
+        </div>`;
+    document.getElementById("carrito-vista").innerHTML = html;
 }
 
-function cambiarCant(i, v) { carrito[i].cant += v; if(carrito[i].cant<=0) carrito.splice(i,1); document.getElementById("cart-count").innerText = carrito.length; verCarrito(); }
-function aplicarD() { descuentoTotal = parseFloat(document.getElementById("valDesc").value)||0; verCarrito(); }
+function eliminarDelCarrito(i) {
+    carrito.splice(i, 1);
+    verCarrito();
+}
 
-function irAVoucher() {
-    document.getElementById("carrito-view").style.display = "none";
-    document.getElementById("voucher-view").style.display = "block";
-    const user = localStorage.getItem("usuario")||"Admin";
-    const sub = carrito.reduce((a,b)=> a+(b.unidad*b.cant), 0);
-    const total = sub - descuentoTotal;
-    const igv = total * 0.18; const base = total - igv;
-    document.getElementById("voucher-view").innerHTML = `
-        <div class="factura-box">
-            <h3 style="text-align:center;">A&T KAMIARA S.A.C.</h3>
-            <p style="text-align:center; font-size:10px;">Atendido por: ${user.toUpperCase()}</p><hr>
-            ${carrito.map(p=>`<div style="display:flex; justify-content:space-between;"><span>${p.producto} x${p.cant}</span><span>S/ ${(p.unidad*p.cant).toFixed(2)}</span></div>`).join("")}<hr>
-            <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span><span>S/ ${sub.toFixed(2)}</span></div>
-            <div style="display:flex; justify-content:space-between; color:red;"><span>Descuento:</span><span>- S/ ${descuentoTotal.toFixed(2)}</span></div>
-            <div style="display:flex; justify-content:space-between;"><span>Base Imponible:</span><span>S/ ${base.toFixed(2)}</span></div>
-            <div style="display:flex; justify-content:space-between;"><span>IGV (18%):</span><span>S/ ${igv.toFixed(2)}</span></div>
-            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-top:5px; border-top:1px solid #000;"><span>TOTAL:</span><span>S/ ${total.toFixed(2)}</span></div>
+function generarVoucher() {
+    document.getElementById("carrito-vista").style.display = "none";
+    document.getElementById("voucher-vista").style.display = "block";
+    
+    const user = localStorage.getItem("usuario").toUpperCase();
+    const sub = carrito.reduce((a,b) => a + ((b.cant>=12?b.pDocena:b.pUnitario)*b.cant), 0);
+
+    let html = `
+        <div class="factura-box" id="ticket-pdf">
+            <h2 style="text-align:center;">A&T KAMIARA S.A.C.</h2>
+            <p style="text-align:center;">RUC: 20612345678<br>Av. Principal 123, Lima<br>Vendedor: ${user}</p>
+            <hr>
+            ${carrito.map(p => `
+                <div style="display:flex; justify-content:space-between;">
+                    <span>${p.producto} (${p.talla}) x${p.cant}</span>
+                    <span>S/ ${((p.cant>=12?p.pDocena:p.pUnitario)*p.cant).toFixed(2)}</span>
+                </div>`).join("")}
+            <hr>
+            <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                <span>TOTAL A PAGAR:</span><span>S/ ${sub.toFixed(2)}</span>
+            </div>
+            <p style="text-align:center; margin-top:10px;">¡Gracias por su compra!</p>
         </div>
-        <div class="footer-btns"><button class="btn-rojo" onclick="verCarrito()">Volver</button><button class="btn-verde" onclick="finalizar()">Confirmar</button></div>`;
+        <div class="footer-btns">
+            <button class="btn-izq" onclick="verCarrito()">Volver</button>
+            <button class="btn-der" onclick="descargarPDF()">Descargar PDF</button>
+        </div>`;
+    document.getElementById("voucher-vista").innerHTML = html;
 }
 
-function abrirPanelInterno() { document.getElementById("main-content").style.display = "none"; document.getElementById("panel-admin-view").style.display = "block"; }
-function abrirFormulario() { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfkDXdS7HH4ud4ephIeo0qMyiXqiNXLjs_gpmZF7fDqBoE73A/viewform", "_blank"); }
-function verVentas() { window.open("https://docs.google.com/spreadsheets/d/197The7KApBX0G_p9PCTiAAWZ1oBMLDWQEZIeUDHgXpE", "_blank"); }
-function inicio() { document.getElementById("main-content").style.display="block"; document.getElementById("menu").style.display="grid"; document.getElementById("productos").style.display="none"; document.getElementById("carrito-view").style.display="none"; document.getElementById("voucher-view").style.display="none"; document.getElementById("panel-admin-view").style.display="none"; }
-function finalizar() { mostrarMensaje("Venta procesada", "success"); carrito=[]; document.getElementById("cart-count").innerText=0; inicio(); }
+function descargarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: [80, 150] }); // Formato ticketera
+    
+    doc.text("A&T KAMIARA S.A.C.", 10, 10);
+    doc.setFontSize(8);
+    doc.text("RUC: 20612345678", 10, 15);
+    doc.text("----------------------------------", 10, 20);
+    
+    let y = 25;
+    carrito.forEach(p => {
+        let precio = p.cant >= 12 ? p.pDocena : p.pUnitario;
+        doc.text(`${p.producto.substring(0,20)} x${p.cant}`, 10, y);
+        doc.text(`S/ ${(precio*p.cant).toFixed(2)}`, 60, y);
+        y += 5;
+    });
+
+    doc.text("----------------------------------", 10, y + 5);
+    doc.text(`TOTAL: S/ ${carrito.reduce((a,b)=>a+((b.cant>=12?b.pDocena:b.pUnitario)*b.cant),0).toFixed(2)}`, 10, y + 10);
+    
+    doc.save("Voucher_Kamiara.pdf");
+    alert("Venta finalizada y PDF generado");
+    location.reload();
+}
